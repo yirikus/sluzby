@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Ant-Version: Apache Ant 1.8.2
+Created-By: 1.6.0_23-b04 (Sun Microsystems Inc.)
+Class-Path: lib/iText-2.1.7.jar lib/iText-rtf-2.1.7.jar lib/xercesImpl
+ .jar lib/odfdom.jar
+X-COMMENT: Main-Class will be added automatically by build
+Main-Class: sluzby2.Main
+
