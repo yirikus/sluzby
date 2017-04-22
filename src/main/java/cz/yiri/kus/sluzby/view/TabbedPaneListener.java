@@ -22,9 +22,6 @@ import javax.swing.event.ChangeListener;
 public class TabbedPaneListener implements ChangeListener {
 
     private JToolBar toolBar;
-    private JButton processButton;
-    private JButton saveButton;
-    private JButton loadButton;
     private JButton addButton;
     private JTextField textField;
     private PersonTableModel old;
@@ -33,20 +30,14 @@ public class TabbedPaneListener implements ChangeListener {
     private JTable mainTable;
 
     public TabbedPaneListener(JToolBar toolBar,
-            JButton processButton,
-            JButton saveButton,
-            JButton loadButton,
-            JButton addButton,
-            JTextField textField,
-            PersonTableModel old,
-            PersonTableModel young,
-            CountTableModel counts,
-            JTable mainTable) {
+                              JButton addButton,
+                              JTextField textField,
+                              PersonTableModel old,
+                              PersonTableModel young,
+                              CountTableModel counts,
+                              JTable mainTable) {
 
         this.addButton = addButton;
-        this.loadButton = loadButton;
-        this.processButton = processButton;
-        this.saveButton = saveButton;
         this.textField = textField;
         this.toolBar = toolBar;
         this.counts = counts;

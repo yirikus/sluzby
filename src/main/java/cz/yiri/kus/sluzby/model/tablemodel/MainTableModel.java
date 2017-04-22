@@ -196,11 +196,7 @@ public void setValueAt(Object aValue, int rowIndex, int columnIndex){
 
 @Override
 public boolean isCellEditable(int rowIndex, int columnIndex) {
-    if(columnIndex==0){
-        return false;
-    }else{
-        return true;
-    }
+	return columnIndex != 0;
 }
     public void updateTable(List<Day> days){        
         this.days=days;
