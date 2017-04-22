@@ -1,4 +1,7 @@
-package cz.yiri.kus.sluzby;
+package cz.yiri.kus.sluzby.view;
+
+import cz.yiri.kus.sluzby.model.Person;
+import cz.yiri.kus.sluzby.model.Team;
 
 import java.awt.Component;
 import java.awt.Color;
@@ -60,7 +63,7 @@ public class ColorRenderer extends DefaultTableCellRenderer {
     }
     
     private List<Person> persons;
-    private Team team;    
+    private Team team;
     
     public ColorRenderer(List<Person> persons,Team team){
         super();

@@ -1,4 +1,6 @@
-package cz.yiri.kus.sluzby;
+package cz.yiri.kus.sluzby.model.tablemodel;
+
+import cz.yiri.kus.sluzby.model.Person;
 
 import java.util.ArrayList;
 import java.util.Collection;

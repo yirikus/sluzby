@@ -1,4 +1,14 @@
-package cz.yiri.kus.sluzby;
+package cz.yiri.kus.sluzby.view;
+
+import cz.yiri.kus.sluzby.service.HarmonogramExporter;
+import cz.yiri.kus.sluzby.service.HarmonogramFactory;
+import cz.yiri.kus.sluzby.Main;
+import cz.yiri.kus.sluzby.model.tablemodel.MainTableModel;
+import cz.yiri.kus.sluzby.service.Storage;
+import cz.yiri.kus.sluzby.model.Day;
+import cz.yiri.kus.sluzby.model.Person;
+import cz.yiri.kus.sluzby.model.tablemodel.PersonTableModel;
+import cz.yiri.kus.sluzby.model.Team;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -7,8 +17,6 @@ import java.util.List;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
 
 /**
  *
@@ -44,7 +52,8 @@ public class ToolBarListener implements ActionListener{
     public void actionPerformed(ActionEvent e) {
         //vytvor tabulku pro novy mesic
         if (Constants.CREATE.equals(e.getActionCommand())) {
-            mainModel.updateTable((List<Day>)HarmonogramFactory.newHarmonogram(youngModel.getPersons(), oldModel.getPersons()));
+            mainModel.updateTable((List<Day>) HarmonogramFactory
+              .newHarmonogram(youngModel.getPersons(), oldModel.getPersons()));
             tableCreated=false;
             System.out.println(tableCreated);
 
@@ -69,7 +78,7 @@ public class ToolBarListener implements ActionListener{
 
         //uloz
         } else if (Constants.SAVE.equals(e.getActionCommand())) {
-            Storage.save(youngModel.getPersons(), oldModel.getPersons(),mainModel.getDays());
+            Storage.save(youngModel.getPersons(), oldModel.getPersons(), mainModel.getDays());
 
         } else if (Constants.LOAD.equals(e.getActionCommand())) {
             List<Person> loadedYoung = new ArrayList<Person>();
@@ -92,7 +101,7 @@ public class ToolBarListener implements ActionListener{
             System.out.println("toolBarListener.ADD");
             int index = tabbedPane.getSelectedIndex();
             if(index==2){
-                oldModel.addPerson(new Person(textField.getText(),Team.OLD));
+                oldModel.addPerson(new Person(textField.getText(), Team.OLD));
             }else if(index==3){
                 youngModel.addPerson(new Person(textField.getText(),Team.YOUNG));
             }

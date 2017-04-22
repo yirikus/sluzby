@@ -1,4 +1,7 @@
-package cz.yiri.kus.sluzby;
+package cz.yiri.kus.sluzby.model.tablemodel;
+
+import cz.yiri.kus.sluzby.model.Person;
+import cz.yiri.kus.sluzby.model.Team;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,7 +30,7 @@ public class CountTableModel extends AbstractTableModel{
             case 0:
                 return person.getName();
             case 1:
-                if(person.getTeam()==Team.OLD){
+                if(person.getTeam()== Team.OLD){
                     return "starší";
                 }else{
                     return "mladší";

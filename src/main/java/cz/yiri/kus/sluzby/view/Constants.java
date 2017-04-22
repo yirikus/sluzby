@@ -1,4 +1,4 @@
-package cz.yiri.kus.sluzby;
+package cz.yiri.kus.sluzby.view;
 
 /**
  * Constatns used in program

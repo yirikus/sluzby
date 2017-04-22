@@ -1,7 +1,6 @@
-package cz.yiri.kus.sluzby;
+package cz.yiri.kus.sluzby.model;
 
 import java.util.Calendar;
-import java.util.Locale;
 
 /**
  * reprezentuje kalendarni den s pridanymi slouzicimi doktory

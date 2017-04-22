@@ -1,5 +1,17 @@
 package cz.yiri.kus.sluzby;
 
+import cz.yiri.kus.sluzby.model.tablemodel.CountTableModel;
+import cz.yiri.kus.sluzby.model.Day;
+import cz.yiri.kus.sluzby.model.Person;
+import cz.yiri.kus.sluzby.model.tablemodel.PersonTableModel;
+import cz.yiri.kus.sluzby.model.Team;
+import cz.yiri.kus.sluzby.service.Storage;
+import cz.yiri.kus.sluzby.view.ColorRenderer;
+import cz.yiri.kus.sluzby.view.Constants;
+import cz.yiri.kus.sluzby.view.TabbedPaneListener;
+import cz.yiri.kus.sluzby.view.ToolBarListener;
+import cz.yiri.kus.sluzby.model.tablemodel.MainTableModel;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -149,7 +161,7 @@ public static void main(String[] args) {
         loadedYoung = new ArrayList<Person>();
         loadedOld= new ArrayList<Person>();
         loadedDays= new ArrayList<Day>();
-        Storage.load(loadedYoung,loadedOld,loadedDays);
+        Storage.load(loadedYoung, loadedOld, loadedDays);
         System.out.println("###main: "+loadedDays.size());
 
         youngModel.updateTable(loadedYoung);
@@ -167,7 +179,7 @@ public static void main(String[] args) {
         //setRenderers
         TableColumn oldColumn = table.getColumnModel().getColumn(2);
         TableColumn youngColumn = table.getColumnModel().getColumn(3);
-        TableCellRenderer oldRenderer = new ColorRenderer((List<Person>)oldModel.getPersons(), Team.OLD);        
+        TableCellRenderer oldRenderer = new ColorRenderer((List<Person>)oldModel.getPersons(), Team.OLD);
         TableCellRenderer youngRenderer = new ColorRenderer((List<Person>)youngModel.getPersons(), Team.YOUNG);
         oldColumn.setCellRenderer(oldRenderer);
         youngColumn.setCellRenderer(youngRenderer);

@@ -1,4 +1,6 @@
-package cz.yiri.kus.sluzby;
+package cz.yiri.kus.sluzby.model;
+
+import cz.yiri.kus.sluzby.model.Team;
 
 import java.util.HashSet;
 import java.util.Set;

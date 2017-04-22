@@ -1,4 +1,4 @@
-package cz.yiri.kus.sluzby;
+package cz.yiri.kus.sluzby.util;
 
 /**
  * Thrown when String has unsupported format

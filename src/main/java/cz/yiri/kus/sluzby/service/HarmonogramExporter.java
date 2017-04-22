@@ -1,4 +1,7 @@
-package cz.yiri.kus.sluzby;
+package cz.yiri.kus.sluzby.service;
+
+import cz.yiri.kus.sluzby.model.Day;
+import cz.yiri.kus.sluzby.model.Person;
 
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
