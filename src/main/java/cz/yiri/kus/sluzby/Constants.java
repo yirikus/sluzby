@@ -1,4 +1,4 @@
-package sluzby2;
+package cz.yiri.kus.sluzby;
 
 public class Constants
 {
@@ -9,9 +9,3 @@ public class Constants
   public static final String CREATE = "CREATE";
   public static final String WRITE = "WRITE";
 }
-
-
-/* Location:              C:\Users\Dell\Desktop\sluzby\interna\sluzby2.jar!\sluzby2\Constants.class
- * Java compiler version: 5 (49.0)
- * JD-Core Version:       0.7.1
- */

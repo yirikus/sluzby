@@ -1,4 +1,4 @@
-/*     */ package sluzby2;
+/*     */ package cz.yiri.kus.sluzby;
 /*     */ 
 /*     */ import java.util.Calendar;
 /*     */ 
