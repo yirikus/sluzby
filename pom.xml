@@ -19,34 +19,89 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>2.5.1</version>
         <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
+          <source>1.8</source>
+          <target>1.8</target>
         </configuration>
       </plugin>
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-jar-plugin</artifactId>
+			<configuration>
+				<archive>
+					<manifest>
+						<addClasspath>true</addClasspath>
+						<mainClass>cz.yiri.kus.sluzby.Main</mainClass>
+					</manifest>
+				</archive>
+			</configuration>
+		</plugin>
+		<!--<plugin>-->
+			<!--<groupId>org.apache.maven.plugins</groupId>-->
+			<!--<artifactId>maven-dependency-plugin</artifactId>-->
+			<!--<executions>-->
+				<!--<execution>-->
+					<!--<id>copy-dependencies</id>-->
+					<!--<phase>package</phase>-->
+					<!--<goals>-->
+						<!--<goal>copy-dependencies</goal>-->
+					<!--</goals>-->
+					<!--<configuration>-->
+						<!--<outputDirectory>${project.build.directory}</outputDirectory>-->
+						<!--<overWriteReleases>false</overWriteReleases>-->
+						<!--<overWriteSnapshots>true</overWriteSnapshots>-->
+					<!--</configuration>-->
+				<!--</execution>-->
+			<!--</executions>-->
+		<!--</plugin>-->
+		<!--<plugin>-->
+			<!--<artifactId>maven-assembly-plugin</artifactId>-->
+			<!--<configuration>-->
+				<!--<archive>-->
+					<!--<manifest>-->
+						<!--<addClasspath>true</addClasspath>-->
+						<!--<mainClass>cz.yiri.kus.sluzby.Main</mainClass>-->
+					<!--</manifest>-->
+				<!--</archive>-->
+				<!--<descriptorRefs>-->
+					<!--<descriptorRef>jar-with-dependencies</descriptorRef>-->
+				<!--</descriptorRefs>-->
+			<!--</configuration>-->
+			<!--<executions>-->
+				<!--<execution>-->
+					<!--<id>make-assembly</id> &lt;!&ndash; this is used for inheritance merges &ndash;&gt;-->
+					<!--<phase>package</phase> &lt;!&ndash; bind to the packaging phase &ndash;&gt;-->
+					<!--<goals>-->
+						<!--<goal>single</goal>-->
+					<!--</goals>-->
+				<!--</execution>-->
+			<!--</executions>-->
+		<!--</plugin>-->
     </plugins>
   </build>
-  <dependencyManagement>
+	<!--<repositories>-->
+	<!--<repository>-->
+		<!--<releases>-->
+			<!--<enabled>true</enabled>-->
+		<!--</releases>-->
+		<!--<snapshots>-->
+			<!--<enabled>false</enabled>-->
+		<!--</snapshots>-->
+		<!--<id>sonatype-nexus-releases</id>-->
+		<!--<name>Sonatype Nexus releasess</name>-->
+		<!--<url>https://oss.sonatype.org/content/repositories/releases/</url>-->
+	<!--</repository>-->
+	<!--</repositories>-->
 		<dependencies>
 			<dependency>
-				<groupId>com.lowagie</groupId>
-				<artifactId>itext</artifactId>
-				<version>2.1.7</version>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.10</version>
+				<scope>test</scope>
 			</dependency>
-			<dependency>
-				<groupId>com.lowagie</groupId>
-				<artifactId>itext-rtf</artifactId>
-				<version>2.1.7</version>
-			</dependency>
-			<dependency>
-				<groupId>xerces</groupId>
-				<artifactId>xercesImpl</artifactId>
-				<version>2.11.0</version>
-			</dependency>
-			<dependency>
-				<groupId>org.odftoolkit</groupId>
-				<artifactId>odfdom-java</artifactId>
-				<version>0.8.7</version>
-			</dependency>
+			<!--<dependency>-->
+				<!--<groupId>org.odftoolkit</groupId>-->
+				<!--<artifactId>odfdom-java</artifactId>-->
+				<!--<version>0.8.6</version>-->
+			<!--</dependency>-->
 		</dependencies>
-	</dependencyManagement>	
 </project>

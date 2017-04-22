@@ -3,247 +3,331 @@ package cz.yiri.kus.sluzby;
 import java.util.HashSet;
 import java.util.Set;
 
-
-public class Person
-  implements Comparable {
-	private boolean hasHoliday = false;
-	private boolean wantsOnly = false;
-
-	private String name;
-
-	private Team team;
-
-	private Set<Integer> unwantedDays = new HashSet();
-	private Set<Integer> wantedDays = new HashSet();
-
-	private Set<Integer> usedDays = new HashSet();
-
-
-	public Person(String name, Team team) {
-		this(name, new HashSet(), new HashSet(), team);
-	}
-
-
-	public Person(String name, Set<Integer> bad, Set<Integer> good, Team team) {
-		this.name = name;
-		this.unwantedDays = bad;
-		this.team = team;
-	}
-
-
-	public boolean isWantsOnly() {
-		return this.wantsOnly;
-	}
-
-
-	public void setWantsOnly(boolean wantsOnly) {
-		this.wantsOnly = wantsOnly;
-	}
-
-
-	public Team getTeam() {
-		return this.team;
-	}
-
-
-	public void setHasHoliday(boolean hasWeekend) {
-		this.hasHoliday = hasWeekend;
-	}
-
-
-	public boolean hasHoliday() {
-		return this.hasHoliday;
-	}
-
-
-	public Set<Integer> getWorkDays() {
-		return this.usedDays;
-	}
-
-
-	public boolean canWorkOn(Integer i) {
-		if (this.wantsOnly) {
-			return this.wantedDays.contains(i);
-		}
-		return !this.unwantedDays.contains(i);
-	}
-
-
-	public boolean worksOn(Integer i) {
-		return this.usedDays.contains(i);
-	}
-
-
-	public void addUnwanted(Integer i) {
-		this.unwantedDays.add(i);
-	}
-
-
-	public void setUnwantedDays(String unwanted) {
-		this.unwantedDays.clear();
-		this.unwantedDays = parseDaysFromString(unwanted);
-	}
-
-
-	public void setWantedDays(String wanted) {
-		this.wantedDays.clear();
-		this.wantedDays = parseDaysFromString(wanted);
-	}
-
-
-	public void setWorkDays(String work) {
-		this.usedDays.clear();
-		this.usedDays = parseDaysFromString(work);
-	}
-
-
-	private Set<Integer> parseDaysFromString(String str) {
-		Set<Integer> result = new HashSet();
-
-		String rest = str;
-		rest = rest.trim();
-		StringBuffer number = new StringBuffer("");
-
-		for (int i = 0; i < rest.length(); i++) {
-			if (Character.isDigit(rest.charAt(i))) {
-				number.append(rest.charAt(i));
-			} else if (!number.toString().equals("")) {
-				result.add(Integer.valueOf(Integer.parseInt(number.toString())));
-				number.delete(0, number.length());
-			}
-		}
-
-		if (!number.toString().equals("")) {
-			result.add(Integer.valueOf(Integer.parseInt(number.toString())));
-			number.delete(0, number.length());
-		}
-
-		return result;
-	}
-
-
-	public void clearWorkingDays() {
-		this.usedDays.clear();
-		setHasHoliday(false);
-	}
-
-
-	public void addUsed(Day d) {
-		this.usedDays.add(d.getInteger());
-		if (d.isHoliday()) {
-			setHasHoliday(true);
-		}
-	}
-
-	public void removeUsed(Day d) {
-		this.usedDays.remove(d.getInteger());
-		if (d.isHoliday()) {
-			setHasHoliday(false);
-		}
-	}
-
-
-	public void addWanted(Integer i) {
-		this.wantedDays.add(i);
-	}
-
-
-	public boolean worksAround(Integer day, int radius) {
-		for (Integer i : this.usedDays) {
-			if ((i.intValue() >= day.intValue() - radius) && (i.intValue() <= day.intValue() + radius)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-
-	public String unwantedDaysToString() {
-		StringBuilder sb = new StringBuilder("");
-		for (Integer i : this.unwantedDays) {
-			sb.append(i);
-			sb.append(",");
-		}
-		return sb.toString();
-	}
-
-
-	public String wantedDaysToString() {
-		StringBuilder sb = new StringBuilder("");
-		for (Integer i : this.wantedDays) {
-			sb.append(i);
-			sb.append(",");
-		}
-		return sb.toString();
-	}
-
-
-	public int hashCode() {
-		return this.name.hashCode();
-	}
-
-
-	public boolean equals(Object o) {
-		if ((o instanceof Person)) {
-			Person p2 = (Person) o;
-			return this.name.equals(p2.getName());
-		}
-		return false;
-	}
-
-
-	public String getName() {
-		return this.name;
-	}
-
-
-	public int compareTo(Object o) {
-		Person p = (Person) o;
-		if (sizeOfUnwantedDays() - p.sizeOfUnwantedDays() != 0) {
-			return -(sizeOfUnwantedDays() - p.sizeOfUnwantedDays());
-		}
-		return -this.name.compareTo(p.getName());
-	}
-
-
-	public int sizeOfUnwantedDays() {
-		return this.unwantedDays.size();
-	}
-
-
-	public int sizeOfWantedDays() {
-		return this.wantedDays.size();
-	}
-
-
-	public int sizeOfWorkingDays() {
-		return this.usedDays.size();
-	}
-
-
-	public String toString() {
-		String str = this.name + " ";
-		for (Integer i : this.unwantedDays) {
-			str = str + i + " ";
-		}
-		return str;
-	}
-
-	public void setName(String string) {
-		this.name = string;
-	}
-
-	public Set<Integer> getUnwantedDays() {
-		return this.unwantedDays;
-	}
-
-	public Set<Integer> getWantedDays() {
-		return this.wantedDays;
-	}
-}
-
-
-/* Location:              C:\Users\Dell\Desktop\sluzby\interna\sluzby2.jar!\sluzby2\Person.class
- * Java compiler version: 5 (49.0)
- * JD-Core Version:       0.7.1
+/**
+ *
+ * @author Administrator
  */
+public class Person implements Comparable{
+    
+    private boolean hasHoliday = false;
+    private boolean wantsOnly = false;
+    private String name;
+    private Team team;
+
+
+    //Wanted and unwanted days
+    private Set<Integer> unwantedDays = new HashSet<Integer>();
+    private Set<Integer> wantedDays = new HashSet<Integer>();
+
+    private Set<Integer> usedDays = new HashSet<Integer>();
+    
+    /**
+     * konstruktor tridy Person, dny, kdy osoba nemuze slouzit se pridaji pozdeji
+     * @param name Jmeno osoby
+     */
+    public Person(String name, Team team) {
+        this(name,new HashSet<Integer>(),new HashSet<Integer>(), team);
+    }
+
+
+    /**
+     * konstruktor tridy Person
+     * @param name jmeno osoby
+     *        bad mnozina dnu, kdy osoba nemuze slouzit
+     *        bad mnozina dnu, kdy osoba chce slouzit
+     */
+    public Person(String name, Set<Integer> bad,Set<Integer> good, Team team) {
+        this.name = name;
+        this.unwantedDays = bad;
+        this.team=team;
+    }
+    
+    /**
+     * Vraci true pokud osoba chce slouzit pouze specifikovane dny
+     * @return 
+     */
+    public boolean isWantsOnly() {
+        return wantsOnly;
+    }
+
+    /**
+     * Nastavi jestli osoba chce pouze specifikovane dny
+     * @param wantsOnly 
+     */
+    public void setWantsOnly(boolean wantsOnly) {
+        this.wantsOnly = wantsOnly;
+    }
+    
+    /**
+     * Returns team of person, there are two teams young and old
+     * @return team
+     */
+    public Team getTeam() {
+        return team;
+    }
+
+    /**
+     * Sets
+     * @param hasWeekend 
+     */
+    public void setHasHoliday(boolean hasWeekend) {
+        this.hasHoliday = hasWeekend;
+    }
+
+    /**
+     * Returns true if person is assigned to the holiday, one person can have perfectly only one holiday
+     * @return
+     */
+    public boolean hasHoliday(){
+        return hasHoliday;
+    }
+
+    /**
+     * Returns set of days on which Person works
+     * @return
+     */
+    public Set<Integer> getWorkDays() {
+        return usedDays;
+    }
+    
+    /**
+     * Returns false when given days is in unwanted days list, otherwise true
+     * @param i den
+     * @return true pokud osoba dany den nemuze slouzit
+     */
+    public boolean canWorkOn(Integer i){
+        if(wantsOnly){
+           return wantedDays.contains(i); 
+        }else{
+            return !unwantedDays.contains(i);
+        }
+    }
+    /**
+     * Vraci true pokud osoba dany den slouzi
+     * @param i den
+     * @return true pokud osoba dany slouzi
+     */
+    public boolean worksOn(Integer i){
+        return usedDays.contains(i);
+    }
+    
+    /**
+     * Prida den, kdy osoba nemuze slouzit
+     * @param i den
+     */
+    public void addUnwanted(Integer i){
+        unwantedDays.add(i);
+    }
+    /**
+     * Sets unwanted days
+     * @param unwanted
+     */
+    public void setUnwantedDays(String unwanted){
+        unwantedDays.clear();
+        unwantedDays = parseDaysFromString(unwanted);
+    }
+    /**
+     * Sets wanted days
+     * @param wanted
+     */
+    public void setWantedDays(String wanted){
+        wantedDays.clear();
+        wantedDays = parseDaysFromString(wanted);
+    }
+
+    /**
+     * Sets work days (it does not set anything else, like hasHoliday, etc.)
+     * @param work
+     */
+    public void setWorkDays(String work){
+        usedDays.clear();
+        usedDays = parseDaysFromString(work);
+    }
+
+    /**
+     * Parses String to set of integers
+     * @param str string to be parsed
+     */
+  private Set<Integer> parseDaysFromString(String str){
+
+        Set<Integer> result = new HashSet<Integer>();
+        int i;
+        String rest = str;
+        rest = rest.trim();
+        StringBuffer number= new StringBuffer("");
+
+        for (i = 0; i < rest.length(); i++) {
+           if(Character.isDigit(rest.charAt(i))){
+              number.append(rest.charAt(i));
+           }else{
+               if(!number.toString().equals("")){
+                   result.add(Integer.parseInt(number.toString()));
+                   number.delete(0, number.length());
+               }
+           }
+        }
+         if(!number.toString().equals("")){
+                   result.add(Integer.parseInt(number.toString()));
+                   number.delete(0, number.length());
+               }
+
+      return result;
+  }
+
+  /**
+   * Vynuluje sluzby
+   */
+  public void clearWorkingDays(){
+    usedDays.clear();
+    setHasHoliday(false);
+  }
+    /**
+     * Prida den, ve ktery osoba bude slouzit
+     * @param d den
+     */
+    public void addUsed(Day d){
+        usedDays.add(d.getInteger());
+        if(d.isHoliday()){
+            setHasHoliday(true);
+        }
+    }
+
+    public void removeUsed(Day d){
+        usedDays.remove(d.getInteger());
+        if(d.isHoliday()){
+            setHasHoliday(false);
+        }
+    }
+
+    /**
+     * Prida den, ve ktery osoba chce slouzit
+     * @param i den
+     */
+    public void addWanted(Integer i){
+        wantedDays.add(i);
+    }
+    /**
+     * Returns true if given day is near to any other used days using given radius
+     * @param day day to be tested
+     * @param radius radius
+     * @return
+     */
+    public boolean worksAround(Integer day,int radius){
+        for(Integer i:usedDays){
+            if(i>=(day-radius) && i<=(day+radius)){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Returns set of unwanted days as a string
+     */
+    public String unwantedDaysToString(){
+        StringBuilder sb = new StringBuilder("");
+        for(Integer i:unwantedDays){
+            sb.append(i);
+            sb.append(",");
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Returns set of wanted days as a string
+     */
+    public String wantedDaysToString(){
+        StringBuilder sb = new StringBuilder("");
+        for(Integer i:wantedDays){
+            sb.append(i);
+            sb.append(",");
+        }
+        return sb.toString();
+    }
+    
+    /**
+     * Hash code
+     */
+    @Override
+    public int hashCode(){
+        return name.hashCode();
+    }
+    
+    /**
+     * Two persons equals when they have the same name
+     */
+    @Override
+    public boolean equals(Object o){
+        if(o instanceof Person){
+            Person p2=(Person)o;
+            return name.equals(p2.getName());
+        }else{
+            return false;
+        }
+    }
+    /**
+     * @return jmeno osoby
+     */
+    public String getName() {
+        return name;
+    }
+    /**
+     * Porovna na zaklade poctu dnu, kdy osoba nemuze slouzit a jmena
+     */
+    public int compareTo(Object o) {
+        Person p =(Person)o;
+        if((sizeOfUnwantedDays() - p.sizeOfUnwantedDays())!=0){
+            return -(sizeOfUnwantedDays() - p.sizeOfUnwantedDays());
+        }else{
+            return -name.compareTo(p.getName());
+        }
+    }
+    
+    /**
+     * @return pocet dnu, kdy osoba nemuze slouzit
+     */
+    public int sizeOfUnwantedDays(){
+        return unwantedDays.size();
+    }
+
+    /**
+     * @return pocet dnu, kdy osoba chce slouzit
+     */
+    public int sizeOfWantedDays(){
+        return wantedDays.size();
+    }
+    
+    /**
+     * @return pocet dnu, kdy osoba slouzi
+     */
+    public int sizeOfWorkingDays(){
+        return usedDays.size();
+    }        
+    
+    /**
+     * TODO: předělat
+     * K NICEMU!
+     * to string (jmeno den den den ...)
+     */
+    @Override
+    public String toString(){
+        String str = name+" ";
+        for(Integer i:unwantedDays){
+            str += i+" ";
+        }
+        return str;
+    }
+
+   public void setName(String string) {
+        this.name=string;
+    }
+
+    public Set<Integer> getUnwantedDays() {
+        return unwantedDays;
+    }
+
+    public Set<Integer> getWantedDays() {
+        return wantedDays;
+    }
+    
+}

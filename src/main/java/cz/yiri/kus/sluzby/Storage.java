@@ -8,183 +8,209 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.PrintStream;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 
-
+/**
+ *
+ * @author terrmith
+ */
 public class Storage {
-	private static final String DATA_FILE = "data.txt";
-	private static final String COLUMN = ":";
-	private static final String SEPARATOR = "#";
-	private static final String END = "&";
 
-	public static void save(Collection<Person> young, Collection<Person> old, Collection<Day> days) {
-		try {
-			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("data.txt")));
+    private static final String DATA_FILE = "data.txt";
+    private static final String COLUMN = ":";
+    private static final String SEPARATOR = "#";
+    private static final String END = "&";
 
-			savePersons(writer, young);
-			savePersons(writer, old);
+    /**
+     * static class
+     */
+    private Storage() {
+    }
 
-			saveDays(writer, days);
+    /**
+     * Saves current values
+     */
+    public static void save(Collection<Person> young, Collection<Person> old, Collection<Day> days) {
+        //nutno ulozit old, young,days
+        try {
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(DATA_FILE)));
 
-			writer.close();
-		} catch (FileNotFoundException fnf) {
-			System.err.println("Dany soubor neexistuje");
-		} catch (IOException ioe) {
-			System.err.println("IOE");
-		}
-	}
+            savePersons(writer, young);
+            savePersons(writer, old);
 
+            saveDays(writer, days);
 
-	public static void load(List<Person> young, List<Person> old, List<Day> days) {
-		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("data.txt")));
+            writer.close();
+        } catch (FileNotFoundException fnf) {
+            System.err.println("Dany soubor neexistuje");
 
-			loadPersons(reader, young, Team.YOUNG);
-			loadPersons(reader, old, Team.OLD);
+        } catch (IOException ioe) {
+            System.err.println("IOE");
 
-			loadDays(reader, young, old, days);
+        }
+    }
 
-			reader.close();
-		} catch (FileNotFoundException fnf) {
-			System.err.println("Dany soubor neexistuje");
-		} catch (IOException ioe) {
-			System.err.println("IOE");
-		}
-	}
+    /**
+     * Loads previous table
+     */
+    public static void load(List<Person> young, List<Person> old, List<Day> days) {
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(DATA_FILE)));
 
+            loadPersons(reader, young, Team.YOUNG);
+            loadPersons(reader, old, Team.OLD);
 
-	private static void savePersons(BufferedWriter writer, Collection<Person> persons)
-	  throws FileNotFoundException, IOException {
-		for (Person p : persons) {
-			writer.write(p.getName() + ":" + p.isWantsOnly() + ":" + p.hasHoliday() + ":");
+            loadDays(reader, young, old, days);
 
+            reader.close();
+        } catch (FileNotFoundException fnf) {
+            System.err.println("Dany soubor neexistuje");
 
-			writer.write("#");
-			for (Integer i : p.getUnwantedDays()) {
-				writer.write(i + "#");
-			}
-			writer.write(":");
-			writer.write("#");
-			for (Integer i : p.getWantedDays()) {
-				writer.write(i + "#");
-			}
-			writer.write(":");
-			writer.write("#");
-			for (Integer i : p.getWorkDays()) {
-				writer.write(i + "#");
-			}
-			writer.write(":");
-			writer.newLine();
-		}
-		writer.write("&");
-		writer.newLine();
-	}
+        } catch (IOException ioe) {
+            System.err.println("IOE");
 
-	private static void loadPersons(BufferedReader reader, Collection<Person> persons, Team team) throws IOException {
-		String string = reader.readLine();
-		while ((string != null) && (!string.equals("&"))) {
-			System.out.println("loadPersons.reading: " + string);
-			String[] splitted = string.split(":");
-			for (int i = 0; i < splitted.length; i++) {
-				System.out.println(i + ": " + splitted[i]);
-			}
-			String name = splitted[0];
-			boolean wantsOnly = splitted[1].equals("true");
-			boolean hasHoliday = splitted[2].equals("true");
+        }
+    }   
 
-			Person person = new Person(name, team);
-			person.setWantsOnly(wantsOnly);
-			person.setHasHoliday(hasHoliday);
-			person.setUnwantedDays(splitted[3]);
-			person.setWantedDays(splitted[4]);
-			person.setWorkDays(splitted[5]);
+    /**
+     * Saves persons separating columns by $ and values in column by #, end is indicated by &
+     * @param writer
+     * @param persons
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    private static void savePersons(BufferedWriter writer, Collection<Person> persons) throws FileNotFoundException, IOException {
 
-			persons.add(person);
+        for (Person p : persons) {
+            writer.write(p.getName() + COLUMN +
+                    p.isWantsOnly() + COLUMN +
+                    p.hasHoliday() + COLUMN);
 
-			string = reader.readLine();
-		}
-	}
+            writer.write(SEPARATOR);
+            for (Integer i : p.getUnwantedDays()) {
+                writer.write(i + SEPARATOR);
+            }
+            writer.write(COLUMN);
+            writer.write(SEPARATOR);
+            for (Integer i : p.getWantedDays()) {
+                writer.write(i + SEPARATOR);
+            }
+            writer.write(COLUMN);
+            writer.write(SEPARATOR);
+            for (Integer i : p.getWorkDays()) {
+                writer.write(i + SEPARATOR);
+            }
+            writer.write(COLUMN);
+            writer.newLine();
+        }
+        writer.write(END);
+        writer.newLine();
 
-	private static void saveDays(BufferedWriter writer, Collection<Day> days)
-	  throws FileNotFoundException, IOException {
-		for (Day d : days) {
-			writer.write(
-			  d.toString() + ":" + (d.getOld() != null ? d.getOld().getName() : "#") + ":" + (d.getYoung() != null ?
-				d.getYoung().getName() : "#") + ":" + (d.getThird() != null ? d.getThird().getName() : "#") + ":" + d
-				.isHoliday() + ":");
+    }
 
+    private static void loadPersons(BufferedReader reader, Collection<Person> persons, Team team) throws IOException {
+        String string = reader.readLine();
+        int lineNumber = 1;
+        while (string != null && !string.equals(END)) {
+            String[] splitted = string.split(COLUMN);
+            if (splitted.length != 6) {
+                throw new IllegalStateException("Chyba na řádku #" + lineNumber + ": " + string + ". Očekávaný formát: jméno" + COLUMN + "chcePouze" + COLUMN + "máSvátek" + COLUMN + "nechtěnéDny" + COLUMN + "chtěnéDny" + COLUMN + "přidělené dny");
+            }
+            String name = splitted[0];
+            boolean wantsOnly = splitted[1].equals("true") ? true : false;
+            boolean hasHoliday = splitted[2].equals("true") ? true : false;
 
-			writer.newLine();
-		}
+            Person person = new Person(name, team);
+            person.setWantsOnly(wantsOnly);
+            person.setHasHoliday(hasHoliday);
+            person.setUnwantedDays(splitted[3]);
+            person.setWantedDays(splitted[4]);
+            person.setWorkDays(splitted[5]);
 
-		writer.write("&");
-		writer.newLine();
-	}
+            persons.add(person);
 
-	private static void loadDays(BufferedReader reader, List<Person> young, List<Person> old, List<Day> days)
-	  throws IOException {
-		String string = reader.readLine();
-		while ((string != null) && (!string.equals("&"))) {
-			System.out.println(string);
+            string = reader.readLine();
+            lineNumber++;
+        }
+    }
 
-			String[] splitted = string.split(":");
-			String[] date = splitted[0].split("\\.");
-			for (int i = 0; i < splitted.length; i++) {
-				System.out.println(i + ": " + splitted[i]);
-			}
-			System.out.println("--");
-			for (int i = 0; i < date.length; i++) {
-				System.out.println(i + ": " + date[i]);
-			}
-			Integer dayOfMonth = new Integer(date[0]);
-			Integer month = Integer.valueOf(new Integer(date[1]).intValue() - 1);
-			Integer year = new Integer(date[2]);
-			String oldName = splitted[1];
-			String youngName = splitted[2];
-			String thirdName = splitted[3];
-			boolean holiday = splitted[4].equals("true");
+    private static void saveDays(BufferedWriter writer, Collection<Day> days) throws FileNotFoundException, IOException {
+        for (Day d : days) {
+            writer.write(d.toString() + COLUMN +
+                    (d.getOld() != null ? d.getOld().getName() : SEPARATOR) + COLUMN +
+                    (d.getYoung() != null ? d.getYoung().getName() : SEPARATOR) + COLUMN +
+                    (d.getThird() != null ? d.getThird().getName() : SEPARATOR) + COLUMN +
+                     d.isHoliday()+COLUMN);
+            writer.newLine();
+        }
 
-			Calendar cal = Calendar.getInstance();
-			cal.set(1, year.intValue());
-			cal.set(2, month.intValue());
-			cal.set(5, dayOfMonth.intValue());
+        writer.write(END);
+        writer.newLine();
+    }
 
-			Day day = new Day(cal, holiday);
-			if (!youngName.equals("#")) {
-				Person p = new Person(youngName, Team.YOUNG);
-				if (young.contains(p)) {
-					day.setYoung((Person) young.get(young.indexOf(p)));
-				} else {
-					throw new IllegalArgumentException("young does not contain given name");
-				}
-			}
+    private static void loadDays(BufferedReader reader, List<Person> young, List<Person> old, List<Day> days) throws IOException {
+        String string = reader.readLine();
+        while (string != null && !string.equals(END)) {
+            System.out.println(string);
+            
+            String[] splitted = string.split(COLUMN);
+            String[] date = splitted[0].split("\\.");
+            for(int i=0;i<splitted.length;i++){
+                System.out.println(i+": "+splitted[i]);
+            }
+            System.out.println("--");
+            for(int i=0;i<date.length;i++){
+                System.out.println(i+": "+date[i]);
+            }
+            Integer dayOfMonth = new Integer(date[0]);
+            Integer month = new Integer(date[1])-1;
+            Integer year = new Integer(date[2]);
+            String oldName = splitted[1];
+            String youngName = splitted[2];
+            String thirdName = splitted[3];
+            boolean holiday = splitted[4].equals("true")?true:false;
 
-			if (!oldName.equals("#")) {
-				Person p = new Person(oldName, Team.YOUNG);
-				if (old.contains(p)) {
-					day.setOld((Person) old.get(old.indexOf(p)));
-				} else {
-					throw new IllegalArgumentException("old does not contain given name");
-				}
-			}
+            Calendar cal = Calendar.getInstance();
+            cal.set(Calendar.YEAR, year);
+            cal.set(Calendar.MONTH, month);
+            cal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-			if (!thirdName.equals("#")) {
-				Person p = new Person(thirdName, Team.YOUNG);
-				if (young.contains(p)) {
-					day.setThird((Person) young.get(young.indexOf(p)));
-				} else if (old.contains(p)) {
-					day.setThird((Person) old.get(old.indexOf(p)));
-				} else {
-					throw new IllegalArgumentException("young nor old does not contain given name");
-				}
-			}
+            Day day = new Day(cal, holiday);
+            if (!youngName.equals(SEPARATOR)) {
+                Person p = new Person(youngName, Team.YOUNG);
+                if (young.contains(p)) {
+                    day.setYoung(young.get(young.indexOf(p)));
+                } else {
+                    throw new IllegalArgumentException("young does not contain given name");
+                }
+            }
 
-			days.add(day);
+            if (!oldName.equals(SEPARATOR)) {
+                Person p = new Person(oldName, Team.YOUNG);
+                if (old.contains(p)) {
+                    day.setOld(old.get(old.indexOf(p)));
+                } else {
+                    throw new IllegalArgumentException("old does not contain given name");
+                }
+            }
 
-			string = reader.readLine();
-		}
-	}
+            if (!thirdName.equals(SEPARATOR)) {
+                Person p = new Person(thirdName, Team.YOUNG);
+                if (young.contains(p)) {
+                    day.setThird(young.get(young.indexOf(p)));
+                } else if (old.contains(p)) {
+                    day.setThird(old.get(old.indexOf(p)));
+                } else {
+                    throw new IllegalArgumentException("young nor old does not contain given name");
+                }
+            }
+
+            days.add(day);
+
+            string = reader.readLine();
+        }
+    }
 }
+
