@@ -236,6 +236,8 @@ public class Main {
 	public static void setCellRendererAsComboBox(int i, JTable table, Collection<Person> persons) {
 		TableColumn column = table.getColumnModel().getColumn(i);
 		JComboBox<String> comboBox = new JComboBox<String>();
+		// empty, so it is possible to remove a person
+		comboBox.addItem("");
 		for (Person p : persons) {
 			comboBox.addItem(p.getName());
 		}

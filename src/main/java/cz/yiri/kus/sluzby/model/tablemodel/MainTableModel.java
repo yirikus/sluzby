@@ -9,204 +9,243 @@ import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
 /**
- *
  * @author terrmith
  */
-public class MainTableModel extends AbstractTableModel{
+public class MainTableModel extends AbstractTableModel {
 
-    private List<Day> days;
-    private PersonTableModel oldModel;
-    private PersonTableModel youngModel;
+	private List<Day> days;
+	private PersonTableModel oldModel;
+	private PersonTableModel youngModel;
 
-    public MainTableModel(PersonTableModel oldModel,PersonTableModel youngModel) {
-        super();
-        this.days= new ArrayList<Day>();
-        this.oldModel=oldModel;
-        this.youngModel=youngModel;
+	public MainTableModel(PersonTableModel oldModel, PersonTableModel youngModel) {
+		super();
+		this.days = new ArrayList<Day>();
+		this.oldModel = oldModel;
+		this.youngModel = youngModel;
 
-    }
+	}
 
-    public int getRowCount() {
-        return days.size();
-    }
+	public int getRowCount() {
+		return days.size();
+	}
 
-    public int getColumnCount() {
-        return 5;
-    }
+	public int getColumnCount() {
+		return 5;
+	}
 
-    public Object getValueAt(int rowIndex, int columnIndex) {
-        Day day = days.get(rowIndex);
-        switch (columnIndex) {
-            case 0:
-                return day.print();
-            case 1:
-                return day.isHoliday();
-            case 2:
-                if(day.getOld()==null){
-                    return "-";
-                }else{
-                    return day.getOld().getName();
-                }
-            case 3:
-                if(day.getYoung()==null){
-                    return "-";
-                }else{
-                    return day.getYoung().getName();
-                }
-            case 4:
-                if(day.getThird()==null){
-                    return "-";
-                }else{
-                    return day.getThird().getName();
-                }
-            default:
-                throw new IllegalArgumentException("columnIndex");
-        }
+	public Object getValueAt(int rowIndex, int columnIndex) {
+		Day day = days.get(rowIndex);
+		switch (columnIndex) {
+			case 0:
+				return day.print();
+			case 1:
+				return day.isHoliday();
+			case 2:
+				if (day.getOld() == null) {
+					return "-";
+				} else {
+					return day.getOld().getName();
+				}
+			case 3:
+				if (day.getYoung() == null) {
+					return "-";
+				} else {
+					return day.getYoung().getName();
+				}
+			case 4:
+				if (day.getThird() == null) {
+					return "-";
+				} else {
+					return day.getThird().getName();
+				}
+			default:
+				throw new IllegalArgumentException("columnIndex");
+		}
 
-    }
+	}
 
-    @Override
-public String getColumnName(int columnIndex) {
-    switch (columnIndex) {
-        case 0:
-            return "Datum";
-        case 1:
-            return "Svátek";
-        case 2:
-            return "Interna - starší";
-        case 3:
-            return "Interna - mladší";
-        case 4:
-            return "Dialýza";
-        default:
-            throw new IllegalArgumentException("columnIndex");
-    }
-}
+	@Override
+	public String getColumnName(int columnIndex) {
+		switch (columnIndex) {
+			case 0:
+				return "Datum";
+			case 1:
+				return "Svátek";
+			case 2:
+				return "Interna - starší";
+			case 3:
+				return "Interna - mladší";
+			case 4:
+				return "Dialýza";
+			default:
+				throw new IllegalArgumentException("columnIndex");
+		}
+	}
 
-    @Override
-public Class<?> getColumnClass(int columnIndex) {
-    switch (columnIndex) {
-        case 1:
-            return Boolean.class;
-        case 0:
-        case 2:
-        case 3:
-        case 4:
-            return String.class;
+	@Override
+	public Class<?> getColumnClass(int columnIndex) {
+		switch (columnIndex) {
+			case 1:
+				return Boolean.class;
+			case 0:
+			case 2:
+			case 3:
+			case 4:
+				return String.class;
 
-        default:
-            throw new IllegalArgumentException("columnIndex");
-    }
-}
+			default:
+				throw new IllegalArgumentException("columnIndex");
+		}
+	}
 
-@Override
-public void setValueAt(Object aValue, int rowIndex, int columnIndex){
-    Day day = days.get(rowIndex);
-    Person p;
-    Person o;
-    switch (columnIndex) {
-        case 1:
-            day.setHoliday((Boolean)aValue);
-            break;
-        case 2:
-            //note: if adding a person number of work days must be updated
-            if(oldModel.getPersons()==null || oldModel.getPersons().isEmpty()){
-                System.out.println("mainTab leModel.column2.null or empty");
-                return;
-            }
+	@Override
+	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+		Day day = days.get(rowIndex);
+		Person p;
+		Person o;
+		switch (columnIndex) {
+			case 1:
+				day.setHoliday((Boolean) aValue);
+				break;
+			case 2:
+				//note: if adding a person number of work days must be updated
+				if (checkOld()) {
+					return;
+				}
 
-            p = new Person((String)aValue, Team.OLD);
+				setOldCell((String) aValue, day);
+				break;
+			case 3:
+				//note: if adding a person number of work days must be updated
+				if (checkYoung()) {
+					return;
+				}
+				setYoungCell((String) aValue, day);
+				break;
+			case 4:
+				//note: dialyza does not change number of work days
+				if (checkYoungAndOld()) {
+					return;
+				}
+				setDialyzaCell((String) aValue, day);
+				break;
 
-            List<Person> ps = new ArrayList<Person>();
-            ps.addAll(oldModel.getPersons());
+			default:
+				throw new IllegalArgumentException("columnIndex");
+		}
+		fireTableCellUpdated(rowIndex, columnIndex);
 
-            //there are no doctors in the list
+	}
 
-            o=day.getOld();
-            if(o!=null){
-                o.removeUsed(day);
-            }
+	private boolean checkYoungAndOld() {
+		if (oldModel.getPersons() == null || oldModel.getPersons().isEmpty()) {
+			System.out.println("mainTableModel.column4.null or empty");
+			return true;
+		}
+		if (youngModel.getPersons() == null || youngModel.getPersons().isEmpty()) {
+			System.out.println("mainTableModel.column4.null or empty");
+			return true;
+		}
+		return false;
+	}
 
-            if(ps.contains(p)){
-               p=ps.get(ps.indexOf(p));
-            }else{
-                throw new IllegalArgumentException();
-            }
-            day.setOld(p);
-            break;
-        case 3:
-            //note: if adding a person number of work days must be updated
-           if(youngModel.getPersons()==null || youngModel.getPersons().isEmpty()){
-               System.out.println("mainTableModel.column3.null or empty");
-                return;
-            }
-            p = new Person((String)aValue, Team.YOUNG);
+	private boolean checkYoung() {
+		if (youngModel.getPersons() == null || youngModel.getPersons().isEmpty()) {
+			System.out.println("mainTableModel.column3.null or empty");
+			return true;
+		}
+		return false;
+	}
 
-            List<Person> ps2 = new ArrayList<Person>();
-            ps2.addAll(youngModel.getPersons());
+	private boolean checkOld() {
+		if (oldModel.getPersons() == null || oldModel.getPersons().isEmpty()) {
+			System.out.println("mainTab leModel.column2.null or empty");
+			return true;
+		}
+		return false;
+	}
 
-            o=day.getYoung();
-            if(o!=null){
-                o.removeUsed(day);
-            }
+	private void setOldCell(String aValue, Day day) {
+		Person p;
+		Person o;
+		p = new Person((String) aValue, Team.OLD);
 
-            if(ps2.contains(p)){
-               p=ps2.get(ps2.indexOf(p));
-            }else{
-                throw new IllegalArgumentException();
-            }
-            day.setYoung(p);
-            break;
-        case 4:
-            //note: dialyza does not change number of work days
-            if(oldModel.getPersons()==null || oldModel.getPersons().isEmpty()){
-                System.out.println("mainTableModel.column4.null or empty");
-                return;
-            }
-            if(youngModel.getPersons()==null || youngModel.getPersons().isEmpty()){
-                System.out.println("mainTableModel.column4.null or empty");
-                return;
-            }
-            Person pyj = new Person((String)aValue, Team.YOUNG);
+		List<Person> ps = new ArrayList<Person>();
+		ps.addAll(oldModel.getPersons());
 
-            List<Person> pyjs = new ArrayList<Person>();
-            pyjs.addAll(youngModel.getPersons());
-            List<Person> pojs = new ArrayList<Person>();
-            pojs.addAll(oldModel.getPersons());
+		//there are no doctors in the list
 
-            o=day.getThird();
+		o = day.getOld();
+		if (o != null) {
+			o.removeUsed(day);
+		}
 
-            if(pyjs.contains(pyj)){
-               p=pyjs.get(pyjs.indexOf(pyj));
-            }else if(pojs.contains(pyj)){
-               p=pojs.get(pojs.indexOf(pyj));
-            }else{
-                throw new IllegalArgumentException();
-            }
+		if (ps.contains(p)) {
+			p = ps.get(ps.indexOf(p));
+		} else {
+			p = null;
+		}
+		day.setOld(p);
+	}
 
-            day.setThird(p);
-            break;
+	private void setYoungCell(String aValue, Day day) {
+		Person p;
+		Person o;
+		p = new Person((String) aValue, Team.YOUNG);
 
-        default:
-            throw new IllegalArgumentException("columnIndex");
-    }
-    fireTableCellUpdated(rowIndex, columnIndex);
-    
-}
+		List<Person> ps2 = new ArrayList<Person>();
+		ps2.addAll(youngModel.getPersons());
 
-@Override
-public boolean isCellEditable(int rowIndex, int columnIndex) {
-	return columnIndex != 0;
-}
-    public void updateTable(List<Day> days){        
-        this.days=days;
-        System.out.println("###updateTable: "+this.days.size());
-        fireTableDataChanged();
-    }
+		o = day.getYoung();
+		if (o != null) {
+			o.removeUsed(day);
+		}
 
-    public List<Day> getDays() {
-        System.out.println("###getDays: "+this.days.size());
-        return days;
-    }
+		if (ps2.contains(p)) {
+			p = ps2.get(ps2.indexOf(p));
+		} else {
+			p = null;
+		}
+		day.setYoung(p);
+	}
+
+	private void setDialyzaCell(String aValue, Day day) {
+		Person o;
+		Person p;
+		Person pyj = new Person((String) aValue, Team.YOUNG);
+
+		List<Person> pyjs = new ArrayList<Person>();
+		pyjs.addAll(youngModel.getPersons());
+		List<Person> pojs = new ArrayList<Person>();
+		pojs.addAll(oldModel.getPersons());
+
+		o = day.getThird();
+
+		if (pyjs.contains(pyj)) {
+			p = pyjs.get(pyjs.indexOf(pyj));
+		} else if (pojs.contains(pyj)) {
+			p = pojs.get(pojs.indexOf(pyj));
+		} else {
+			p = null;
+		}
+
+		day.setThird(p);
+	}
+
+	@Override
+	public boolean isCellEditable(int rowIndex, int columnIndex) {
+		return columnIndex != 0;
+	}
+
+	public void updateTable(List<Day> days) {
+		this.days = days;
+		System.out.println("###updateTable: " + this.days.size());
+		fireTableDataChanged();
+	}
+
+	public List<Day> getDays() {
+		System.out.println("###getDays: " + this.days.size());
+		return days;
+	}
 
 }

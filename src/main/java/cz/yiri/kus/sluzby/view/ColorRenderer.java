@@ -77,11 +77,10 @@ public class ColorRenderer extends DefaultTableCellRenderer {
 		  (table, value, isSelected, hasFocus, row, column);
 
 		if (persons == null) {
-			throw new NullPointerException("List<Person> persons must not be null, call setPersons method");
+			throw new IllegalStateException("List<Person> persons must not be null, call setPersons method");
 		}
 		if (value instanceof String) {
 			Person mockPerson = new Person((String) value, this.team);
-			System.out.println("colorRenderer:" + persons.size());
 			Color color = Colors.getColor(persons.indexOf(mockPerson));
 			cell.setBackground(color);
 		}

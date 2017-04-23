@@ -71,12 +71,16 @@ public class Day {
 
 	public void setOld(Person old) {
 		this.old = old;
-		old.addUsed(this);
+		if (old != null) {
+			old.addUsed(this);
+		}
 	}
 
 	public void setYoung(Person young) {
 		this.young = young;
-		young.addUsed(this);
+		if (young != null) {
+			young.addUsed(this);
+		}
 	}
 
 	public Person getOld() {

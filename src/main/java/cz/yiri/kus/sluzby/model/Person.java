@@ -257,7 +257,7 @@ public class Person implements Comparable {
 	public boolean equals(Object o) {
 		if (o instanceof Person) {
 			Person p2 = (Person) o;
-			return name.equals(p2.getName());
+			return name == null ? p2.getName() == null : name.equals(p2.getName());
 		} else {
 			return false;
 		}
