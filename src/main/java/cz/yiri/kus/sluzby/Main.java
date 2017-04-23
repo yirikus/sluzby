@@ -141,7 +141,7 @@ public class Main {
 
 			//listeners
 			ToolBarListener toolbarListener =
-			  new ToolBarListener(tabbedPane, textField, youngModel, oldModel, tableModel, table);
+			  new ToolBarListener(tabbedPane, textField, youngModel, oldModel, tableModel, table,frame);
 			addButton.addActionListener(toolbarListener);
 			loadButton.addActionListener(toolbarListener);
 			saveButton.addActionListener(toolbarListener);

@@ -30,29 +30,30 @@
 				<archive>
 					<manifest>
 						<addClasspath>true</addClasspath>
+						<classpathPrefix>lib/</classpathPrefix>
 						<mainClass>cz.yiri.kus.sluzby.Main</mainClass>
 					</manifest>
 				</archive>
 			</configuration>
 		</plugin>
-		<!--<plugin>-->
-			<!--<groupId>org.apache.maven.plugins</groupId>-->
-			<!--<artifactId>maven-dependency-plugin</artifactId>-->
-			<!--<executions>-->
-				<!--<execution>-->
-					<!--<id>copy-dependencies</id>-->
-					<!--<phase>package</phase>-->
-					<!--<goals>-->
-						<!--<goal>copy-dependencies</goal>-->
-					<!--</goals>-->
-					<!--<configuration>-->
-						<!--<outputDirectory>${project.build.directory}</outputDirectory>-->
-						<!--<overWriteReleases>false</overWriteReleases>-->
-						<!--<overWriteSnapshots>true</overWriteSnapshots>-->
-					<!--</configuration>-->
-				<!--</execution>-->
-			<!--</executions>-->
-		<!--</plugin>-->
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-dependency-plugin</artifactId>
+			<executions>
+				<execution>
+					<id>copy-dependencies</id>
+					<phase>package</phase>
+					<goals>
+						<goal>copy-dependencies</goal>
+					</goals>
+					<configuration>
+						<outputDirectory>${project.build.directory}/lib</outputDirectory>
+						<overWriteReleases>false</overWriteReleases>
+						<overWriteSnapshots>true</overWriteSnapshots>
+					</configuration>
+				</execution>
+			</executions>
+		</plugin>
 		<!--<plugin>-->
 			<!--<artifactId>maven-assembly-plugin</artifactId>-->
 			<!--<configuration>-->
@@ -98,10 +99,15 @@
 				<version>4.10</version>
 				<scope>test</scope>
 			</dependency>
-			<!--<dependency>-->
-				<!--<groupId>org.odftoolkit</groupId>-->
-				<!--<artifactId>odfdom-java</artifactId>-->
-				<!--<version>0.8.6</version>-->
-			<!--</dependency>-->
+			<dependency>
+				<groupId>org.odftoolkit</groupId>
+				<artifactId>odfdom-java</artifactId>
+				<version>0.8.7</version>
+			</dependency>
+			<dependency>
+				<groupId>org.odftoolkit</groupId>
+				<artifactId>simple-odf</artifactId>
+				<version>0.6.6</version>
+			</dependency>
 		</dependencies>
 </project>

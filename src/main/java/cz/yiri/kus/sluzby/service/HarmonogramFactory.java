@@ -61,7 +61,7 @@ public class HarmonogramFactory {
 
 //ok
 			if (day.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY ||
-			  day.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
+			  day.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY || PublicHolidays.isPublicHoliday(day)) {
 
 				Day newDay = new Day(day, true);
 				days.add(newDay);
