@@ -192,7 +192,7 @@ public class Storage {
 				if (young.contains(p)) {
 					day.setYoung(young.get(young.indexOf(p)));
 				} else {
-					throw new IllegalArgumentException("young does not contain given name");
+					day.setYoung(null);
 				}
 			}
 
@@ -201,7 +201,7 @@ public class Storage {
 				if (old.contains(p)) {
 					day.setOld(old.get(old.indexOf(p)));
 				} else {
-					throw new IllegalArgumentException("old does not contain given name");
+					day.setOld(null);
 				}
 			}
 
@@ -212,7 +212,7 @@ public class Storage {
 				} else if (old.contains(p)) {
 					day.setThird(old.get(old.indexOf(p)));
 				} else {
-					throw new IllegalArgumentException("young nor old does not contain given name");
+					day.setThird(null);
 				}
 			}
 
