@@ -1,16 +1,13 @@
 package cz.yiri.kus.sluzby.view;
 
 import cz.yiri.kus.sluzby.Main;
-import cz.yiri.kus.sluzby.model.tablemodel.CountTableModel;
+import cz.yiri.kus.sluzby.model.FormModel;
 import cz.yiri.kus.sluzby.model.Person;
-import cz.yiri.kus.sluzby.model.tablemodel.PersonTableModel;
+import cz.yiri.kus.sluzby.model.tablemodel.CountTableModel;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JButton;
 import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -21,58 +18,42 @@ import javax.swing.event.ChangeListener;
  */
 public class TabbedPaneListener implements ChangeListener {
 
-    private JToolBar toolBar;
-    private JButton addButton;
-    private JTextField textField;
-    private PersonTableModel old;
-    private PersonTableModel young;
-    private CountTableModel counts;
-    private JTable mainTable;
+	private final FormModel model;
+	private final ComponentTree components;
 
-    public TabbedPaneListener(JToolBar toolBar,
-                              JButton addButton,
-                              JTextField textField,
-                              PersonTableModel old,
-                              PersonTableModel young,
-                              CountTableModel counts,
-                              JTable mainTable) {
+	public TabbedPaneListener(ComponentTree components,
+                              FormModel model) {
 
-        this.addButton = addButton;
-        this.textField = textField;
-        this.toolBar = toolBar;
-        this.counts = counts;
-        this.old = old;
-        this.young = young;
-        this.mainTable = mainTable;
+	    this.model = model;
+	    this.components = components;
     }
 
     public void stateChanged(ChangeEvent e) {
         JTabbedPane source = (JTabbedPane) e.getSource();
         int index = source.getSelectedIndex();
-
+	    JToolBar toolBar = components.getToolBar();
         switch (index) {
             case 0:
-                toolBar.remove(textField);
-                toolBar.remove(addButton);
-                Main.setCellRendererAsComboBox(2, mainTable, old.getPersons());
-                Main.setCellRendererAsComboBox(3, mainTable, young.getPersons());
+                toolBar.remove(components.getDoctorNameField());
+                toolBar.remove(components.getAddButton());
+                Main.setCellRendererAsComboBox(2, components.getMainTable(), model.getOld());
+                Main.setCellRendererAsComboBox(3, components.getMainTable(), model.getYoung());
                 List<Person> youngAndOld = new ArrayList<Person>();
-                youngAndOld.addAll(old.getPersons());
-                youngAndOld.addAll(young.getPersons());
-                Main.setCellRendererAsComboBox(4, mainTable, youngAndOld);
+                youngAndOld.addAll(model.getOld());
+                youngAndOld.addAll(model.getYoung());
+                Main.setCellRendererAsComboBox(4, components.getMainTable(), youngAndOld);
                 break;
             case 1:
-                toolBar.remove(textField);
-                toolBar.remove(addButton);
-
-                counts.updateTable(old.getPersons(), young.getPersons());
+                toolBar.remove(components.getDoctorNameField());
+                toolBar.remove(components.getAddButton());
+	            ((CountTableModel)components.getCountTable().getModel()).updateTable(model);
                 break;
             case 2:
             case 3:
-                toolBar.remove(textField);
-                toolBar.remove(addButton);
-                toolBar.add(addButton);
-                toolBar.add(textField);
+                toolBar.remove(components.getDoctorNameField());
+                toolBar.remove(components.getAddButton());
+                toolBar.add(components.getAddButton());
+                toolBar.add(components.getDoctorNameField());
                 break;
         }
         toolBar.revalidate();

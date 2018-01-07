@@ -13,9 +13,13 @@ import javax.swing.table.AbstractTableModel;
  */
 public class PersonTableModel extends AbstractTableModel{
 
-    private List<Person> persons = new ArrayList<Person>();
+    private final List<Person> persons;
 
-    public int getRowCount() {
+	public PersonTableModel(List<Person> persons) {
+		this.persons = persons;
+	}
+
+	public int getRowCount() {
         return persons.size();
     }
 

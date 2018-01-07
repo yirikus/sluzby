@@ -2,7 +2,10 @@ package cz.yiri.kus.sluzby.view;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JToolBar;
 
 /**
  * @author jiri.kus
@@ -18,6 +21,12 @@ public class ComponentTree {
 	private JButton prevCalendar;
 	private JButton nextCalendar;
 	private JFrame frame;
+	private JTable oldTable;
+	private JTable countTable;
+	private JTable youngTable;
+	private JTable mainTable;
+	private JTabbedPane tabbedPane;
+	private JToolBar toolBar;
 
 	public JButton getProcessButton() {
 		return processButton;
@@ -97,5 +106,53 @@ public class ComponentTree {
 
 	public void setFrame(JFrame frame) {
 		this.frame = frame;
+	}
+
+	public void setOldTable(JTable oldTable) {
+		this.oldTable = oldTable;
+	}
+
+	public JTable getOldTable() {
+		return oldTable;
+	}
+
+	public void setCountTable(JTable countTable) {
+		this.countTable = countTable;
+	}
+
+	public JTable getCountTable() {
+		return countTable;
+	}
+
+	public void setYoungTable(JTable youngTable) {
+		this.youngTable = youngTable;
+	}
+
+	public JTable getYoungTable() {
+		return youngTable;
+	}
+
+	public void setMainTable(JTable mainTable) {
+		this.mainTable = mainTable;
+	}
+
+	public JTable getMainTable() {
+		return mainTable;
+	}
+
+	public JTabbedPane getTabbedPane() {
+		return tabbedPane;
+	}
+
+	public void setTabbedPane(JTabbedPane tabbedPane) {
+		this.tabbedPane = tabbedPane;
+	}
+
+	public void setToolBar(JToolBar toolBar) {
+		this.toolBar = toolBar;
+	}
+
+	public JToolBar getToolBar() {
+		return toolBar;
 	}
 }

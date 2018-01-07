@@ -1,0 +1,11 @@
+*.idea
+*.iml
+target/
+.settings
+.project
+.classpath
+data.txt
+dist 2.3/
+tabulka.html
+tabulka.odt
+tabulka2_3.odt

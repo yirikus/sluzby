@@ -1,6 +1,7 @@
 package cz.yiri.kus.sluzby.service;
 
 import cz.yiri.kus.sluzby.model.Day;
+import cz.yiri.kus.sluzby.model.FormModel;
 import cz.yiri.kus.sluzby.model.Person;
 import cz.yiri.kus.sluzby.model.Team;
 
@@ -12,9 +13,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
+import java.util.Vector;
 
 /**
  * @author terrmith
@@ -35,15 +38,14 @@ public class Storage {
 	/**
 	 * Saves current values
 	 */
-	public static void save(Collection<Person> young, Collection<Person> old, Collection<Day> days) {
+	public static void save(FormModel model) {
 		//nutno ulozit old, young,days
 		try {
-			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(DATA_FILE)));
+			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(getFileName(model))));
 
-			savePersons(writer, young);
-			savePersons(writer, old);
-
-			saveDays(writer, days);
+			savePersons(writer, model.getYoung());
+			savePersons(writer, model.getOld());
+			saveDays(writer, model.getDays());
 
 			writer.close();
 		} catch (FileNotFoundException fnf) {
@@ -55,17 +57,23 @@ public class Storage {
 		}
 	}
 
+	private static String getFileName(FormModel model) {
+		return "data/" + model.getDate().get(Calendar.YEAR) + model.getDate().get(Calendar.MONTH) + ".txt";
+	}
+
 	/**
-	 * Loads previous table
+	 * Loads previously stored table
+	 * @param date date of table to load
 	 */
-	public static void load(List<Person> young, List<Person> old, List<Day> days) {
+	public static FormModel load(Calendar date) {
+		FormModel model = new FormModel();
 		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(DATA_FILE)));
+			model.setDate(date);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(getFileName(model))));
 
-			loadPersons(reader, young, Team.YOUNG);
-			loadPersons(reader, old, Team.OLD);
-
-			loadDays(reader, young, old, days);
+			model.setYoung(loadPersons(reader, Team.YOUNG));
+			model.setOld(loadPersons(reader, Team.OLD));
+			model.setDays(loadDays(reader, model));
 
 			reader.close();
 		} catch (FileNotFoundException fnf) {
@@ -75,6 +83,7 @@ public class Storage {
 			System.err.println("IOE");
 
 		}
+		return model;
 	}
 
 	/**
@@ -115,9 +124,10 @@ public class Storage {
 
 	}
 
-	private static void loadPersons(BufferedReader reader, Collection<Person> persons, Team team) throws IOException {
+	private static List<Person> loadPersons(BufferedReader reader, Team team) throws IOException {
 		String string = reader.readLine();
 		int lineNumber = 1;
+		List<Person> persons = new ArrayList<>();
 		while (string != null && !string.equals(END)) {
 			String[] splitted = string.split(COLUMN);
 			if (splitted.length != 6) {
@@ -126,8 +136,8 @@ public class Storage {
 					+ COLUMN + "máSvátek" + COLUMN + "nechtěnéDny" + COLUMN + "chtěnéDny" + COLUMN + "přidělené dny");
 			}
 			String name = splitted[0];
-			boolean wantsOnly = splitted[1].equals("true") ? true : false;
-			boolean hasHoliday = splitted[2].equals("true") ? true : false;
+			boolean wantsOnly = "true".equals(splitted[1]);
+			boolean hasHoliday = "true".equals(splitted[2]);
 
 			Person person = new Person(name, team);
 			person.setWantsOnly(wantsOnly);
@@ -141,10 +151,11 @@ public class Storage {
 			string = reader.readLine();
 			lineNumber++;
 		}
+		return persons;
 	}
 
 	private static void saveDays(BufferedWriter writer, Collection<Day> days)
-	  throws FileNotFoundException, IOException {
+	  throws IOException {
 		for (Day d : days) {
 			writer.write(d.toString() + COLUMN +
 			               (d.getOld() != null ? d.getOld().getName() : SEPARATOR) + COLUMN +
@@ -158,9 +169,10 @@ public class Storage {
 		writer.newLine();
 	}
 
-	private static void loadDays(BufferedReader reader, List<Person> young, List<Person> old, List<Day> days)
+	private static List<Day> loadDays(BufferedReader reader, FormModel model)
 	  throws IOException {
 		String string = reader.readLine();
+		List<Day> days = new ArrayList<>();
 		while (string != null && !string.equals(END)) {
 			System.out.println(string);
 
@@ -187,8 +199,11 @@ public class Storage {
 			cal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
 			Day day = new Day(cal, holiday);
+			List<Person> young = model.getYoung();
+			List<Person> old = model.getOld();
 			if (!youngName.equals(SEPARATOR)) {
 				Person p = new Person(youngName, Team.YOUNG);
+
 				if (young.contains(p)) {
 					day.setYoung(young.get(young.indexOf(p)));
 				} else {
@@ -197,7 +212,7 @@ public class Storage {
 			}
 
 			if (!oldName.equals(SEPARATOR)) {
-				Person p = new Person(oldName, Team.YOUNG);
+				Person p = new Person(oldName, Team.OLD);
 				if (old.contains(p)) {
 					day.setOld(old.get(old.indexOf(p)));
 				} else {
@@ -217,9 +232,9 @@ public class Storage {
 			}
 
 			days.add(day);
-
 			string = reader.readLine();
 		}
+		return days;
 	}
 }
 

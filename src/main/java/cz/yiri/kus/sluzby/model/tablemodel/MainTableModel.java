@@ -1,6 +1,7 @@
 package cz.yiri.kus.sluzby.model.tablemodel;
 
 import cz.yiri.kus.sluzby.model.Day;
+import cz.yiri.kus.sluzby.model.FormModel;
 import cz.yiri.kus.sluzby.model.Person;
 import cz.yiri.kus.sluzby.model.Team;
 
@@ -14,14 +15,14 @@ import javax.swing.table.AbstractTableModel;
 public class MainTableModel extends AbstractTableModel {
 
 	private List<Day> days;
-	private PersonTableModel oldModel;
-	private PersonTableModel youngModel;
+	private List<Person> old;
+	private List<Person> young;
 
-	public MainTableModel(PersonTableModel oldModel, PersonTableModel youngModel) {
+	public MainTableModel(FormModel model) {
 		super();
-		this.days = new ArrayList<Day>();
-		this.oldModel = oldModel;
-		this.youngModel = youngModel;
+		this.days = model.getDays();
+		this.old = model.getOld();
+		this.young = model.getYoung();
 
 	}
 
@@ -101,8 +102,6 @@ public class MainTableModel extends AbstractTableModel {
 	@Override
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 		Day day = days.get(rowIndex);
-		Person p;
-		Person o;
 		switch (columnIndex) {
 			case 1:
 				day.setHoliday((Boolean) aValue);
@@ -138,11 +137,11 @@ public class MainTableModel extends AbstractTableModel {
 	}
 
 	private boolean checkYoungAndOld() {
-		if (oldModel.getPersons() == null || oldModel.getPersons().isEmpty()) {
+		if (old == null || old.isEmpty()) {
 			System.out.println("mainTableModel.column4.null or empty");
 			return true;
 		}
-		if (youngModel.getPersons() == null || youngModel.getPersons().isEmpty()) {
+		if (young == null || young.isEmpty()) {
 			System.out.println("mainTableModel.column4.null or empty");
 			return true;
 		}
@@ -150,7 +149,7 @@ public class MainTableModel extends AbstractTableModel {
 	}
 
 	private boolean checkYoung() {
-		if (youngModel.getPersons() == null || youngModel.getPersons().isEmpty()) {
+		if (young == null || young.isEmpty()) {
 			System.out.println("mainTableModel.column3.null or empty");
 			return true;
 		}
@@ -158,7 +157,7 @@ public class MainTableModel extends AbstractTableModel {
 	}
 
 	private boolean checkOld() {
-		if (oldModel.getPersons() == null || oldModel.getPersons().isEmpty()) {
+		if (old == null || old.isEmpty()) {
 			System.out.println("mainTab leModel.column2.null or empty");
 			return true;
 		}
@@ -171,7 +170,7 @@ public class MainTableModel extends AbstractTableModel {
 		p = new Person((String) aValue, Team.OLD);
 
 		List<Person> ps = new ArrayList<Person>();
-		ps.addAll(oldModel.getPersons());
+		ps.addAll(old);
 
 		//there are no doctors in the list
 
@@ -194,7 +193,7 @@ public class MainTableModel extends AbstractTableModel {
 		p = new Person((String) aValue, Team.YOUNG);
 
 		List<Person> ps2 = new ArrayList<Person>();
-		ps2.addAll(youngModel.getPersons());
+		ps2.addAll(young);
 
 		o = day.getYoung();
 		if (o != null) {
@@ -215,9 +214,9 @@ public class MainTableModel extends AbstractTableModel {
 		Person pyj = new Person((String) aValue, Team.YOUNG);
 
 		List<Person> pyjs = new ArrayList<Person>();
-		pyjs.addAll(youngModel.getPersons());
+		pyjs.addAll(young);
 		List<Person> pojs = new ArrayList<Person>();
-		pojs.addAll(oldModel.getPersons());
+		pojs.addAll(old);
 
 		o = day.getThird();
 

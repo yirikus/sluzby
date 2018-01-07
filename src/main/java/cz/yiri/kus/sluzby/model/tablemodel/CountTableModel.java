@@ -1,5 +1,6 @@
 package cz.yiri.kus.sluzby.model.tablemodel;
 
+import cz.yiri.kus.sluzby.model.FormModel;
 import cz.yiri.kus.sluzby.model.Person;
 import cz.yiri.kus.sluzby.model.Team;
 
@@ -14,6 +15,11 @@ import javax.swing.table.AbstractTableModel;
 public class CountTableModel extends AbstractTableModel {
 
 	private List<Person> persons = new ArrayList<Person>();
+
+	public CountTableModel(FormModel model) {
+		persons.addAll(model.getOld());
+		persons.addAll(model.getYoung());
+	}
 
 	public int getRowCount() {
 		return persons.size();
@@ -86,11 +92,10 @@ public class CountTableModel extends AbstractTableModel {
 		return false;
 	}
 
-	public void updateTable(Collection<Person> old, Collection<Person> young) {
+	public void updateTable(FormModel model) {
 		persons.clear();
-		persons.addAll(old);
-		persons.addAll(young);
+		persons.addAll(model.getOld());
+		persons.addAll(model.getYoung());
 		fireTableDataChanged();
 	}
-
 }

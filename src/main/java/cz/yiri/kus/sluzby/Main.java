@@ -1,7 +1,8 @@
 package cz.yiri.kus.sluzby;
 
+import cz.yiri.kus.sluzby.view.ComponentTree;
+import cz.yiri.kus.sluzby.model.FormModel;
 import cz.yiri.kus.sluzby.model.tablemodel.CountTableModel;
-import cz.yiri.kus.sluzby.model.Day;
 import cz.yiri.kus.sluzby.model.Person;
 import cz.yiri.kus.sluzby.model.tablemodel.PersonTableModel;
 import cz.yiri.kus.sluzby.model.Team;
@@ -14,6 +15,8 @@ import cz.yiri.kus.sluzby.model.tablemodel.MainTableModel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -22,6 +25,7 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -38,18 +42,14 @@ import javax.swing.table.TableColumn;
  */
 public class Main {
 
-	private static JButton processButton;
-	private static JButton saveButton;
-	private static JButton loadButton;
-	private static JButton addButton;
-	private static JButton createButton;
-	private static JButton writeButton;
-	private static JTextField textField;
-	private static JFrame frame;
-	private static final String VERSION = "2.3.0";
+	private static final ComponentTree components = new ComponentTree();
+	private static final String VERSION = "2.3.1";
+	//model
+	private static FormModel model = new FormModel();
 
 	public static void main(String[] args) {
 
+		initModel();
 		//Schedule a job for the event-dispatching thread:
 		//creating and showing this application's GUI.
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -57,6 +57,12 @@ public class Main {
 				createAndShowGUI();
 			}
 		});
+	}
+
+	private static void initModel() {
+		Calendar date = Calendar.getInstance();
+		date.add(Calendar.MONTH,1);
+		model.setDate(date);
 	}
 
 	/**
@@ -67,170 +73,212 @@ public class Main {
 	private static void createAndShowGUI() {
 		//Create and set up the window.
 		try {
-			Calendar today = Calendar.getInstance();
-			String datum = (today.get(Calendar.MONTH) + 1) + "/" + today.get(Calendar.YEAR);
-			frame = new JFrame("Sluzby" + VERSION + ": " + datum);
-			frame.setPreferredSize(new Dimension(800, 640));
-			frame.setLayout(new BorderLayout());
+			createFrame();
+			TabbedPaneListener tabbedPaneListener = new TabbedPaneListener(components, model);
+			ToolBarListener toolbarListener = new ToolBarListener(components, model);
 
 			//////old tab
-			JTable oldTable = new JTable();
-			PersonTableModel oldModel = new PersonTableModel();
-			oldTable.setModel(oldModel);
-			oldTable.setPreferredScrollableViewportSize(new Dimension(500, 70));
-			oldTable.setFillsViewportHeight(true);
-			TableColumn column = oldTable.getColumnModel().getColumn(0);
-			column.setMaxWidth(120);
-			column = oldTable.getColumnModel().getColumn(1);
-			column.setMaxWidth(80);
+			JTable oldTable = createOldTable();
+			components.setOldTable(oldTable);
 
 			//// count tab
-			JTable countTable = new JTable();
-			CountTableModel countModel = new CountTableModel();
-			countTable.setModel(countModel);
-			countTable.setPreferredScrollableViewportSize(new Dimension(500, 70));
-			countTable.setFillsViewportHeight(true);
+			JTable countTable = createCountTable();
+			components.setCountTable(countTable);
 
 			//////young tab
-			JTable youngTable = new JTable();
-			PersonTableModel youngModel = new PersonTableModel();
-			youngTable.setModel(youngModel);
-
-			column = youngTable.getColumnModel().getColumn(0);
-			column.setMaxWidth(120);
-			column = youngTable.getColumnModel().getColumn(1);
-			column.setMaxWidth(80);
-
-			youngTable.setPreferredScrollableViewportSize(new Dimension(500, 70));
-			youngTable.setFillsViewportHeight(true);
+			JTable youngTable = createYoungTable();
+			components.setYoungTable(youngTable);
 
 			//// main table tab
-			JTable table = new JTable();
-			MainTableModel tableModel = new MainTableModel(oldModel, youngModel);
-			table.setModel(tableModel);
-			table.setPreferredScrollableViewportSize(new Dimension(500, 70));
-			table.setFillsViewportHeight(true);
+			JTable table = createMainTable();
+			components.setMainTable(table);
 
+			//layout
+			createLayout(tabbedPaneListener, toolbarListener, oldTable, countTable, youngTable, table);
 
-			setCellRendererAsComboBox(2, table, oldModel.getPersons());
-			setCellRendererAsComboBox(3, table, youngModel.getPersons());
-			List<Person> youngAndOld = new ArrayList<Person>();
-			youngAndOld.addAll(oldModel.getPersons());
-			youngAndOld.addAll(youngModel.getPersons());
-			setCellRendererAsComboBox(4, table, youngAndOld);
+			//load
+			load(oldTable, youngTable, table);
 
-			//////scrollers
-			JScrollPane scrollPane = new JScrollPane(table);
-			JScrollPane oldScrollPane = new JScrollPane(oldTable);
-			JScrollPane youngScrollPane = new JScrollPane(youngTable);
-			JScrollPane countScrollPane = new JScrollPane(countTable);
-
-			//////toolbar
-			JToolBar toolBar = new JToolBar("Tools");
-			addComponents(toolBar);
-
-			//////tabbed pane
-			JTabbedPane tabbedPane = new JTabbedPane();
-			tabbedPane.add("tabulka", scrollPane);
-			tabbedPane.add("počet služeb", countScrollPane);
-			tabbedPane.add("starší", oldScrollPane);
-			tabbedPane.add("mladší", youngScrollPane);
-			TabbedPaneListener listener =
-			  new TabbedPaneListener(toolBar, addButton, textField, oldModel, youngModel, countModel, table);
-			tabbedPane.addChangeListener(listener);
-
-			//listeners
-			ToolBarListener toolbarListener =
-			  new ToolBarListener(tabbedPane, textField, youngModel, oldModel, tableModel, table,frame);
-			addButton.addActionListener(toolbarListener);
-			loadButton.addActionListener(toolbarListener);
-			saveButton.addActionListener(toolbarListener);
-			writeButton.addActionListener(toolbarListener);
-			processButton.addActionListener(toolbarListener);
-			createButton.addActionListener(toolbarListener);
-			textField.addActionListener(toolbarListener);
-			//////frame
-			frame.add(toolBar, BorderLayout.PAGE_START);
-			frame.add(tabbedPane, BorderLayout.CENTER);
-
-			//načíst
-			List<Person> loadedYoung = new ArrayList<Person>();
-			List<Person> loadedOld = new ArrayList<Person>();
-			List<Day> loadedDays = new ArrayList<Day>();
-			Storage.load(loadedYoung, loadedOld, loadedDays);
-			System.out.println("###main: " + loadedDays.size());
-
-			youngModel.updateTable(loadedYoung);
-			oldModel.updateTable(loadedOld);
-			tableModel.updateTable(loadedDays);
-
-			Main.setCellRendererAsComboBox(2, table, oldModel.getPersons());
-			Main.setCellRendererAsComboBox(3, table, youngModel.getPersons());
-
-			List<Person> youngAndOld2 = new ArrayList<Person>();
-			youngAndOld.addAll(oldModel.getPersons());
-			youngAndOld.addAll(youngModel.getPersons());
-			Main.setCellRendererAsComboBox(4, table, youngAndOld2);
-
-			//setRenderers
-			TableColumn oldColumn = table.getColumnModel().getColumn(2);
-			TableColumn youngColumn = table.getColumnModel().getColumn(3);
-			TableCellRenderer oldRenderer = new ColorRenderer((List<Person>) oldModel.getPersons(), Team.OLD);
-			TableCellRenderer youngRenderer = new ColorRenderer((List<Person>) youngModel.getPersons(), Team.YOUNG);
-			oldColumn.setCellRenderer(oldRenderer);
-			youngColumn.setCellRenderer(youngRenderer);
+			setRenderers(table);
 
 			//
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			components.getFrame().setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 			//Display the window.
-			frame.pack();
-			frame.setVisible(true);
+			components.getFrame().pack();
+			components.getFrame().setVisible(true);
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(frame,
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(components.getFrame(),
 			                              e.getMessage(),
 			                              "Chyba!",
 			                              JOptionPane.ERROR_MESSAGE);
-
 		}
+	}
+
+	private static void setRenderers(JTable table) {
+		Main.setCellRendererAsComboBox(2, table, model.getOld());
+		Main.setCellRendererAsComboBox(3, table, model.getYoung());
+
+		List<Person> youngAndOld2 = new ArrayList<Person>();
+		youngAndOld2.addAll(model.getOld());
+		youngAndOld2.addAll(model.getYoung());
+		Main.setCellRendererAsComboBox(4, table, youngAndOld2);
+
+		//setRenderers
+		TableColumn oldColumn = table.getColumnModel().getColumn(2);
+		TableColumn youngColumn = table.getColumnModel().getColumn(3);
+		TableCellRenderer oldRenderer = new ColorRenderer((List<Person>) model.getOld(), Team.OLD);
+		TableCellRenderer youngRenderer = new ColorRenderer((List<Person>) model.getYoung(), Team.YOUNG);
+		oldColumn.setCellRenderer(oldRenderer);
+		youngColumn.setCellRenderer(youngRenderer);
+	}
+
+	private static void load(JTable oldTable, JTable youngTable, JTable table) {
+		FormModel loadedmodel = Storage.load(model.getDate());
+		System.out.println("###main: " + loadedmodel.getDays().size());
+
+		((PersonTableModel)youngTable.getModel()).updateTable(loadedmodel.getYoung());
+		((PersonTableModel)oldTable.getModel()).updateTable(loadedmodel.getOld());
+		((MainTableModel)table.getModel()).updateTable(loadedmodel.getDays());
+	}
+
+	private static void createLayout(TabbedPaneListener tabbedPaneListener, ToolBarListener toolbarListener,
+	                                 JTable oldTable, JTable countTable, JTable youngTable, JTable table) {
+		//////scrollers
+		JScrollPane scrollPane = new JScrollPane(table);
+		JScrollPane oldScrollPane = new JScrollPane(oldTable);
+		JScrollPane youngScrollPane = new JScrollPane(youngTable);
+		JScrollPane countScrollPane = new JScrollPane(countTable);
+
+		//////toolbar
+		JToolBar toolBar = new JToolBar("Tools");
+		addComponents(toolBar, toolbarListener);
+
+		//////tabbed pane
+		JTabbedPane tabbedPane = new JTabbedPane();
+		components.setTabbedPane(tabbedPane);
+		tabbedPane.add("tabulka", scrollPane);
+		tabbedPane.add("počet služeb", countScrollPane);
+		tabbedPane.add("starší", oldScrollPane);
+		tabbedPane.add("mladší", youngScrollPane);
+
+		tabbedPane.addChangeListener(tabbedPaneListener);
+
+		//////frame
+		components.getFrame().add(toolBar, BorderLayout.PAGE_START);
+		components.getFrame().add(tabbedPane, BorderLayout.CENTER);
+		components.setToolBar(toolBar);
+	}
+
+	private static JTable createMainTable() {
+		JTable table = new JTable();
+		MainTableModel tableModel = new MainTableModel(model);
+		table.setModel(tableModel);
+		table.setPreferredScrollableViewportSize(new Dimension(500, 70));
+		table.setFillsViewportHeight(true);
+
+
+		setCellRendererAsComboBox(2, table, model.getOld());
+		setCellRendererAsComboBox(3, table, model.getYoung());
+		List<Person> youngAndOld = new ArrayList<Person>();
+		youngAndOld.addAll(model.getOld());
+		youngAndOld.addAll(model.getYoung());
+		setCellRendererAsComboBox(4, table, youngAndOld);
+		return table;
+	}
+
+	private static JTable createYoungTable() {
+		TableColumn column;
+		JTable youngTable = new JTable();
+		PersonTableModel youngModel = new PersonTableModel(model.getYoung());
+		youngTable.setModel(youngModel);
+
+		column = youngTable.getColumnModel().getColumn(0);
+		column.setMaxWidth(120);
+		column = youngTable.getColumnModel().getColumn(1);
+		column.setMaxWidth(80);
+
+		youngTable.setPreferredScrollableViewportSize(new Dimension(500, 70));
+		youngTable.setFillsViewportHeight(true);
+		return youngTable;
+	}
+
+	private static JTable createCountTable() {
+		JTable countTable = new JTable();
+		CountTableModel countModel = new CountTableModel(model);
+		countTable.setModel(countModel);
+		countTable.setPreferredScrollableViewportSize(new Dimension(500, 70));
+		countTable.setFillsViewportHeight(true);
+		return countTable;
+	}
+
+	private static JTable createOldTable() {
+		JTable oldTable = new JTable();
+		PersonTableModel oldModel = new PersonTableModel(model.getOld());
+		oldTable.setModel(oldModel);
+		oldTable.setPreferredScrollableViewportSize(new Dimension(500, 70));
+		oldTable.setFillsViewportHeight(true);
+		TableColumn column = oldTable.getColumnModel().getColumn(0);
+		column.setMaxWidth(120);
+		column = oldTable.getColumnModel().getColumn(1);
+		column.setMaxWidth(80);
+		return oldTable;
+	}
+
+	private static JFrame createFrame() {
+		JFrame frame = new JFrame("Sluzby " + VERSION);
+		frame.setPreferredSize(new Dimension(800, 640));
+		frame.setLayout(new BorderLayout());
+		components.setFrame(frame);
+		return frame;
 	}
 
 	/**
 	 * Adds various components to the toolbar
 	 *
 	 */
-	private static void addComponents(JToolBar toolBar) {
-		createButton = new JButton("Nový");
-		createButton.setActionCommand(Constants.CREATE);
-		toolBar.add(createButton);
+	private static void addComponents(JToolBar toolBar, ActionListener listener) {
+		components.setCreateButton(addButtonToToolbar(toolBar, "Nový", Constants.CREATE, listener));
+		components.setProcessButton(addButtonToToolbar(toolBar, "Spočítat", Constants.PROCESS, listener));
+		components.setWriteButton(addButtonToToolbar(toolBar, "Dokument k odeslání", Constants.WRITE, listener));
+		components.setSaveButton(addButtonToToolbar(toolBar, "Uložit", Constants.SAVE, listener));
+		components.setLoadButton(addButtonToToolbar(toolBar, "Nahrát", Constants.SAVE, listener));
+		components.setPrevCalendar(addButtonToToolbar(toolBar, "<", Constants.PREV_CALENDAR, listener));
+		addDateToToolbar(toolBar);
+		components.setNextCalendar(addButtonToToolbar(toolBar, ">", Constants.NEXT_CALENDAR, listener));
 
-		processButton = new JButton("Spočítat");
-		processButton.setActionCommand(Constants.PROCESS);
-		toolBar.add(processButton);
-
-		writeButton = new JButton("Dokument k odeslání");
-		writeButton.setActionCommand(Constants.WRITE);
-		toolBar.add(writeButton);
-
-		saveButton = new JButton("Uložit");
-		saveButton.setActionCommand(Constants.SAVE);
-		toolBar.add(saveButton);
-
-		loadButton = new JButton("Nahrát");
-		loadButton.setActionCommand(Constants.LOAD);
-		toolBar.add(loadButton);
 
 		JSeparator sep = new JSeparator(SwingConstants.VERTICAL);
 		toolBar.add(sep);
 
-		addButton = new JButton("Přidej doktora");
+		JButton addButton = new JButton("Přidej doktora");
+		addButton.addActionListener(listener);
 		addButton.setActionCommand(Constants.ADD);
-		//toolBar.add(addButton);
+		components.setAddButton(addButton);
 
-		textField = new JTextField();
-		textField.setPreferredSize(new Dimension(50, 10));
-		textField.setActionCommand(Constants.ADD);
-		//toolBar.add(textField);
+		JTextField doctorNameField = new JTextField();
+		doctorNameField.setPreferredSize(new Dimension(50, 10));
+		doctorNameField.setActionCommand(Constants.ADD);
+		doctorNameField.addActionListener(listener);
+		components.setDoctorNameField(doctorNameField);
+	}
+
+	private static JLabel addDateToToolbar(JToolBar toolBar) {
+		JLabel dateField = new JLabel();
+		String datum = model.getDate().get(Calendar.MONTH) + "/" + model.getDate().get(Calendar.YEAR);
+		dateField.setText(datum);
+		dateField.setFont(new Font("Arial", Font.BOLD, 20));
+		toolBar.add(dateField);
+		return dateField;
+	}
+
+	private static JButton addButtonToToolbar(JToolBar toolBar, String label, String action, ActionListener listener) {
+		JButton newButton = new JButton(label);
+		newButton.setActionCommand(action);
+		newButton.addActionListener(listener);
+		toolBar.add(newButton);
+		return newButton;
 	}
 
 	public static void setCellRendererAsComboBox(int i, JTable table, Collection<Person> persons) {
@@ -243,6 +291,4 @@ public class Main {
 		}
 		column.setCellEditor(new DefaultCellEditor(comboBox));
 	}
-
-
 }

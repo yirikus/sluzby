@@ -1,52 +1,37 @@
 package cz.yiri.kus.sluzby.view;
 
+import cz.yiri.kus.sluzby.model.FormModel;
+import cz.yiri.kus.sluzby.model.tablemodel.MainTableModel;
+import cz.yiri.kus.sluzby.model.tablemodel.PersonTableModel;
 import cz.yiri.kus.sluzby.service.HarmonogramExporter;
 import cz.yiri.kus.sluzby.service.HarmonogramFactory;
 import cz.yiri.kus.sluzby.Main;
-import cz.yiri.kus.sluzby.model.tablemodel.MainTableModel;
 import cz.yiri.kus.sluzby.service.Storage;
 import cz.yiri.kus.sluzby.model.Day;
 import cz.yiri.kus.sluzby.model.Person;
-import cz.yiri.kus.sluzby.model.tablemodel.PersonTableModel;
 import cz.yiri.kus.sluzby.model.Team;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
 
 /**
  * @author terrmith
  */
 public class ToolBarListener implements ActionListener {
 
-	private final JFrame frame;
-	private JTabbedPane tabbedPane;
-	private JTextField textField;
-	private PersonTableModel youngModel;
-	private PersonTableModel oldModel;
-	private MainTableModel mainModel;
-	//private HarmonogramFactory sluzby;
+	private final FormModel model;
+	private final ComponentTree components;
 	private boolean tableCreated;
-	private JTable mainTable;
 	private HarmonogramExporter exporter;
 
 
-	public ToolBarListener(JTabbedPane tabbedPane, JTextField textField, PersonTableModel youngModel,
-	                       PersonTableModel oldModel, MainTableModel mainModel, JTable mainTable, JFrame frame) {
-		this.tabbedPane = tabbedPane;
-		this.textField = textField;
-		this.oldModel = oldModel;
-		this.youngModel = youngModel;
-		this.mainModel = mainModel;
-		this.mainTable = mainTable;
-		this.frame = frame;
-		//sluzby = new HarmonogramFactory(youngModel.getPersons(), oldModel.getPersons());
+	public ToolBarListener(ComponentTree components, FormModel model) {
+		this.model = model;
+		this.components = components;
 	}
 
 	/**
@@ -57,9 +42,10 @@ public class ToolBarListener implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		try {
 			//vytvor tabulku pro novy mesic
+			MainTableModel mainModel = (MainTableModel)components.getMainTable().getModel();
 			if (Constants.CREATE.equals(e.getActionCommand())) {
 				mainModel.updateTable((List<Day>) HarmonogramFactory
-				  .newHarmonogram(youngModel.getPersons(), oldModel.getPersons()));
+				  .newHarmonogram(model.getYoung(), model.getOld()));
 				tableCreated = false;
 				System.out.println(tableCreated);
 
@@ -69,61 +55,73 @@ public class ToolBarListener implements ActionListener {
 				if (tableCreated) {
 					System.out.println("option 1 - " + tableCreated);
 					mainModel.updateTable(
-					  (List<Day>) HarmonogramFactory.newHarmonogram(youngModel.getPersons(), oldModel.getPersons()));
+					  (List<Day>) HarmonogramFactory.newHarmonogram(model.getYoung(), model.getOld()));
 					mainModel.updateTable((List<Day>) HarmonogramFactory
-					  .fillHarmonogram(mainModel.getDays(), youngModel.getPersons(), oldModel.getPersons()));
+					  .fillHarmonogram(mainModel.getDays(), model.getYoung(), model.getOld()));
 
 				} else {
 					System.out.println("option 2 - " + tableCreated);
 					mainModel.updateTable((List<Day>) HarmonogramFactory
-					  .fillHarmonogram(mainModel.getDays(), youngModel.getPersons(), oldModel.getPersons()));
+					  .fillHarmonogram(mainModel.getDays(), model.getYoung(), model.getOld()));
 					tableCreated = true;
 				}
 			} else if (Constants.WRITE.equals(e.getActionCommand())) {
 				exporter = new HarmonogramExporter(mainModel.getDays(), "tabulka");
 				exporter.exportAsHTML();
 				exporter.exportAsODT();
-
-
 				//uloz
 			} else if (Constants.SAVE.equals(e.getActionCommand())) {
-				Storage.save(youngModel.getPersons(), oldModel.getPersons(), mainModel.getDays());
-
+				Storage.save(model);
+			} else if (Constants.PREV_CALENDAR.equals(e.getActionCommand())) {
+				Storage.save(model);
+				model.getDate().add(Calendar.MONTH, -1);
+				load();
+			} else if (Constants.NEXT_CALENDAR.equals(e.getActionCommand())) {
+				Storage.save(model);
+				model.getDate().add(Calendar.MONTH, -1);
+				load();
 			} else if (Constants.LOAD.equals(e.getActionCommand())) {
-				List<Person> loadedYoung = new ArrayList<Person>();
-				List<Person> loadedOld = new ArrayList<Person>();
-				List<Day> loadedDays = new ArrayList<Day>();
-				Storage.load(loadedYoung, loadedOld, loadedDays);
-
-				youngModel.updateTable(loadedYoung);
-				oldModel.updateTable(loadedOld);
-				mainModel.updateTable(loadedDays);
-
-				Main.setCellRendererAsComboBox(2, mainTable, oldModel.getPersons());
-				Main.setCellRendererAsComboBox(3, mainTable, youngModel.getPersons());
-				List<Person> youngAndOld = new ArrayList<Person>();
-				youngAndOld.addAll(oldModel.getPersons());
-				youngAndOld.addAll(youngModel.getPersons());
-				Main.setCellRendererAsComboBox(4, mainTable, youngAndOld);
+				load();
 
 			} else if (Constants.ADD.equals(e.getActionCommand())) {
+				PersonTableModel youngModel = (PersonTableModel)components.getYoungTable().getModel();
+				PersonTableModel oldModel = (PersonTableModel)components.getOldTable().getModel();
 				System.out.println("toolBarListener.ADD");
-				int index = tabbedPane.getSelectedIndex();
+				int index = components.getTabbedPane().getSelectedIndex();
+				String name = components.getDoctorNameField().getText();
 				if (index == 2) {
-					oldModel.addPerson(new Person(textField.getText(), Team.OLD));
+					oldModel.addPerson(new Person(name, Team.OLD));
 				} else if (index == 3) {
-					youngModel.addPerson(new Person(textField.getText(), Team.YOUNG));
+					youngModel.addPerson(new Person(name, Team.YOUNG));
 				}
 
 			}
 		} catch (RuntimeException ex) {
 			// write to file
-			JOptionPane.showMessageDialog(frame,
+			ex.printStackTrace();
+			JOptionPane.showMessageDialog(components.getFrame(),
 			                              ex.getMessage(),
 			                              "Chyba!",
 			                              JOptionPane.ERROR_MESSAGE);
 
 		}
+	}
+
+	private void load() {
+		MainTableModel mainModel = (MainTableModel)components.getMainTable().getModel();
+		FormModel loadedModel = Storage.load(model.getDate());
+		PersonTableModel youngModel = (PersonTableModel)components.getYoungTable().getModel();
+		PersonTableModel oldModel = (PersonTableModel)components.getOldTable().getModel();
+		youngModel.updateTable(loadedModel.getYoung());
+		oldModel.updateTable(loadedModel.getOld());
+		mainModel.updateTable(loadedModel.getDays());
+
+		Main.setCellRendererAsComboBox(2, components.getMainTable(), model.getOld());
+		Main.setCellRendererAsComboBox(3, components.getMainTable(), model.getYoung());
+		List<Person> youngAndOld = new ArrayList<Person>();
+		youngAndOld.addAll(model.getOld());
+		youngAndOld.addAll(model.getYoung());
+		Main.setCellRendererAsComboBox(4, components.getMainTable(), youngAndOld);
 	}
 
 }
