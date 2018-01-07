@@ -113,8 +113,12 @@ public class ToolBarListener implements ActionListener {
 		FormModel loadedModel = Storage.load(model.getDate());
 		PersonTableModel youngModel = (PersonTableModel)components.getYoungTable().getModel();
 		PersonTableModel oldModel = (PersonTableModel)components.getOldTable().getModel();
-		youngModel.updateTable(loadedModel.getYoung());
-		oldModel.updateTable(loadedModel.getOld());
+		if (loadedModel.getYoung() != null && !loadedModel.getYoung().isEmpty()) {
+			youngModel.updateTable(loadedModel.getYoung());
+		}
+		if (loadedModel.getOld() != null && !loadedModel.getOld().isEmpty()) {
+			oldModel.updateTable(loadedModel.getOld());
+		}
 		mainModel.updateTable(loadedModel.getDays());
 
 		Main.setCellRendererAsComboBox(2, components.getMainTable(), model.getOld());
