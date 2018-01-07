@@ -46,7 +46,7 @@ public class ToolBarListener implements ActionListener {
 			MainTableModel mainModel = (MainTableModel)components.getMainTable().getModel();
 			if (Constants.CREATE.equals(e.getActionCommand())) {
 				mainModel.updateTable((List<Day>) HarmonogramFactory
-				  .newHarmonogram(model.getYoung(), model.getOld()));
+				  .newHarmonogram(model.getYoung(), model.getOld(), model.getDate().getTime()));
 				tableCreated = false;
 				System.out.println(tableCreated);
 
@@ -55,7 +55,7 @@ public class ToolBarListener implements ActionListener {
 				if (tableCreated) {
 					System.out.println("option 1 - " + tableCreated);
 					mainModel.updateTable(
-					  (List<Day>) HarmonogramFactory.newHarmonogram(model.getYoung(), model.getOld()));
+					  (List<Day>) HarmonogramFactory.newHarmonogram(model.getYoung(), model.getOld(), model.getDate().getTime()));
 					mainModel.updateTable((List<Day>) HarmonogramFactory
 					  .fillHarmonogram(model.getDays(), model.getYoung(), model.getOld()));
 

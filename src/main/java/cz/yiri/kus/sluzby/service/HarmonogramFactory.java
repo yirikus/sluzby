@@ -7,6 +7,7 @@ import cz.yiri.kus.sluzby.model.Team;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -34,7 +35,7 @@ public class HarmonogramFactory {
 	/**
 	 * Create new blank harmonogram that will be filled later
 	 */
-	public static Collection<Day> newHarmonogram(Collection<Person> young, Collection<Person> old) {
+	public static Collection<Day> newHarmonogram(Collection<Person> young, Collection<Person> old, Date date) {
 		List<Day> days = new ArrayList<Day>();
 		//clear working days
 		for (Person p : old) {
@@ -46,9 +47,7 @@ public class HarmonogramFactory {
 
 		//set date as the next month after the current one
 		Calendar today = Calendar.getInstance();
-		today.set(Calendar.DATE, 1);
-		today.set(Calendar.YEAR, today.get(Calendar.YEAR) + (today.get(Calendar.MONTH)) / 11);
-		today.set(Calendar.MONTH, (today.get(Calendar.MONTH) + 1) % 12);
+		today.setTime(date);
 		System.out.println(dateToString(today));
 
 		int lastDay = today.getActualMaximum(Calendar.DAY_OF_MONTH);
