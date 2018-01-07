@@ -1,6 +1,7 @@
 package cz.yiri.kus.sluzby.view;
 
 import cz.yiri.kus.sluzby.model.FormModel;
+import cz.yiri.kus.sluzby.model.tablemodel.CountTableModel;
 import cz.yiri.kus.sluzby.model.tablemodel.MainTableModel;
 import cz.yiri.kus.sluzby.model.tablemodel.PersonTableModel;
 import cz.yiri.kus.sluzby.service.HarmonogramExporter;
@@ -76,14 +77,17 @@ public class ToolBarListener implements ActionListener {
 				model.getDate().add(Calendar.MONTH, -1);
 				components.getDateField().updateText(model);
 				load();
+				//update counts in case we are on counts tab
+				((CountTableModel)components.getCountTable().getModel()).updateTable(model);
 			} else if (Constants.NEXT_CALENDAR.equals(e.getActionCommand())) {
 				Storage.save(model);
 				model.getDate().add(Calendar.MONTH, 1);
 				components.getDateField().updateText(model);
 				load();
+				//update counts in case we are on counts tab
+				((CountTableModel)components.getCountTable().getModel()).updateTable(model);
 			} else if (Constants.LOAD.equals(e.getActionCommand())) {
 				load();
-
 			} else if (Constants.ADD.equals(e.getActionCommand())) {
 				PersonTableModel youngModel = (PersonTableModel)components.getYoungTable().getModel();
 				PersonTableModel oldModel = (PersonTableModel)components.getOldTable().getModel();
