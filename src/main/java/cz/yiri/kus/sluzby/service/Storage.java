@@ -7,6 +7,7 @@ import cz.yiri.kus.sluzby.model.Team;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -69,6 +70,7 @@ public class Storage {
 		FormModel model = new FormModel();
 		try {
 			model.setDate(date);
+			createDataDirectory();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(getFileName(model))));
 
 			model.setYoung(loadPersons(reader, Team.YOUNG));
@@ -84,6 +86,14 @@ public class Storage {
 
 		}
 		return model;
+	}
+
+	private static void createDataDirectory() {
+		File theDir = new File("data");
+		if (!theDir.exists()) {
+			System.out.println("creating directory: " + theDir.getName());
+			theDir.mkdir();
+		}
 	}
 
 	/**
