@@ -27,6 +27,7 @@ public class ComponentTree {
 	private JTable mainTable;
 	private JTabbedPane tabbedPane;
 	private JToolBar toolBar;
+	private DateComponent dateField;
 
 	public JButton getProcessButton() {
 		return processButton;
@@ -154,5 +155,13 @@ public class ComponentTree {
 
 	public JToolBar getToolBar() {
 		return toolBar;
+	}
+
+	public void setDateField(DateComponent dateField) {
+		this.dateField = dateField;
+	}
+
+	public DateComponent getDateField() {
+		return dateField;
 	}
 }

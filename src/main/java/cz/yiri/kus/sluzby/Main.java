@@ -9,6 +9,7 @@ import cz.yiri.kus.sluzby.model.Team;
 import cz.yiri.kus.sluzby.service.Storage;
 import cz.yiri.kus.sluzby.view.ColorRenderer;
 import cz.yiri.kus.sluzby.view.Constants;
+import cz.yiri.kus.sluzby.view.DateComponent;
 import cz.yiri.kus.sluzby.view.TabbedPaneListener;
 import cz.yiri.kus.sluzby.view.ToolBarListener;
 import cz.yiri.kus.sluzby.model.tablemodel.MainTableModel;
@@ -265,10 +266,9 @@ public class Main {
 	}
 
 	private static JLabel addDateToToolbar(JToolBar toolBar) {
-		JLabel dateField = new JLabel();
-		String datum = model.getDate().get(Calendar.MONTH) + "/" + model.getDate().get(Calendar.YEAR);
-		dateField.setText(datum);
-		dateField.setFont(new Font("Arial", Font.BOLD, 20));
+		DateComponent dateField = new DateComponent();
+		components.setDateField(dateField);
+		dateField.updateText(model);
 		toolBar.add(dateField);
 		return dateField;
 	}

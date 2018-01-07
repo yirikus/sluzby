@@ -14,9 +14,9 @@ import javax.swing.table.AbstractTableModel;
  */
 public class MainTableModel extends AbstractTableModel {
 
-	private List<Day> days;
-	private List<Person> old;
-	private List<Person> young;
+	private final List<Day> days;
+	private final List<Person> old;
+	private final List<Person> young;
 
 	public MainTableModel(FormModel model) {
 		super();
@@ -237,7 +237,8 @@ public class MainTableModel extends AbstractTableModel {
 	}
 
 	public void updateTable(List<Day> days) {
-		this.days = days;
+		this.days.clear();
+		this.days.addAll(days);
 		System.out.println("###updateTable: " + this.days.size());
 		fireTableDataChanged();
 	}

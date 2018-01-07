@@ -105,13 +105,17 @@ public class HarmonogramFactory {
 	 * @return
 	 */
 	public static Collection<Day> fillHarmonogram(List<Day> days, Collection<Person> young, Collection<Person> old) {
-		fillUnwanted(days, young, Team.YOUNG);
-		fillUnwanted(days, old, Team.OLD);
+		//copy days
+		List<Day> newDays = new ArrayList<>();
+		newDays.addAll(days);
 
-		fillTheRest(days, young, Team.YOUNG);
-		fillTheRest(days, old, Team.OLD);
+		fillUnwanted(newDays, young, Team.YOUNG);
+		fillUnwanted(newDays, old, Team.OLD);
 
-		return days;
+		fillTheRest(newDays, young, Team.YOUNG);
+		fillTheRest(newDays, old, Team.OLD);
+
+		return newDays;
 	}
 
 	private static void fillUnwanted(List<Day> days, Collection<Person> persons, Team team) {

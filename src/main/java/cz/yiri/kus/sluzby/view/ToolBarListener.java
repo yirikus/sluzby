@@ -49,7 +49,6 @@ public class ToolBarListener implements ActionListener {
 				tableCreated = false;
 				System.out.println(tableCreated);
 
-
 				//vypocitej harmonogram pro aktualni mesic
 			} else if (Constants.PROCESS.equals(e.getActionCommand())) {
 				if (tableCreated) {
@@ -57,7 +56,7 @@ public class ToolBarListener implements ActionListener {
 					mainModel.updateTable(
 					  (List<Day>) HarmonogramFactory.newHarmonogram(model.getYoung(), model.getOld()));
 					mainModel.updateTable((List<Day>) HarmonogramFactory
-					  .fillHarmonogram(mainModel.getDays(), model.getYoung(), model.getOld()));
+					  .fillHarmonogram(model.getDays(), model.getYoung(), model.getOld()));
 
 				} else {
 					System.out.println("option 2 - " + tableCreated);
@@ -75,10 +74,12 @@ public class ToolBarListener implements ActionListener {
 			} else if (Constants.PREV_CALENDAR.equals(e.getActionCommand())) {
 				Storage.save(model);
 				model.getDate().add(Calendar.MONTH, -1);
+				components.getDateField().updateText(model);
 				load();
 			} else if (Constants.NEXT_CALENDAR.equals(e.getActionCommand())) {
 				Storage.save(model);
-				model.getDate().add(Calendar.MONTH, -1);
+				model.getDate().add(Calendar.MONTH, 1);
+				components.getDateField().updateText(model);
 				load();
 			} else if (Constants.LOAD.equals(e.getActionCommand())) {
 				load();
