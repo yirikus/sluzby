@@ -29,14 +29,14 @@ public class OdtWriter {
 			// add table
 			createTable(days, outputOdt);
 
-			outputOdt.save(fileName + "2_3.odt");
+			outputOdt.save(fileName + "_" + days.get(0).monthAndYearToString("_") + ".odt");
 		} catch (Exception e) {
 			throw new RuntimeException("ERROR: unable to create output file: " + e.getMessage(), e);
 		}
 	}
 
 	private static void createHeader(java.util.List<Day> days, TextDocument outputOdt) {
-		Paragraph paragraph = outputOdt.addParagraph(days.get(0).monthAndYearToString());
+		Paragraph paragraph = outputOdt.addParagraph(days.get(0).monthAndYearToString(null));
 		Font font = new Font("Arial", StyleTypeDefinitions.FontStyle.REGULAR, 24, Color.BLACK);
 		paragraph.setFont(font);
 		paragraph.setHorizontalAlignment(StyleTypeDefinitions.HorizontalAlignmentType.CENTER);

@@ -18,14 +18,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * @author terrmith
  */
 public class Storage {
 
-	private static final String DATA_FILE = "data.txt";
 	private static final String COLUMN = ":";
 	private static final String SEPARATOR = "#";
 	private static final String END = "&";

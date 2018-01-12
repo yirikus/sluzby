@@ -24,7 +24,7 @@ public class Day {
 		this.holiday = holiday;
 	}
 
-	public String monthAndYearToString() {
+	public String monthAndYearToString(String separator) {
 		String value = "";
 		switch (day.get(Calendar.MONTH)) {
 			case Calendar.JANUARY:
@@ -65,7 +65,8 @@ public class Day {
 				break;
 
 		}
-		return value + " " + day.get(Calendar.YEAR);
+		separator = separator == null ? " " : separator;
+		return value + separator + day.get(Calendar.YEAR);
 	}
 
 
