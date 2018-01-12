@@ -44,7 +44,7 @@ import javax.swing.table.TableColumn;
 public class Main {
 
 	private static final ComponentTree components = new ComponentTree();
-	private static final String VERSION = "2.3.1";
+	private static final String VERSION = "2.4.0";
 	//model
 	private static FormModel model = new FormModel();
 
